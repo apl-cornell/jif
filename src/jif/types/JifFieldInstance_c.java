@@ -15,8 +15,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifFieldInstance</code> interface.
  */
-public class JifFieldInstance_c extends FieldInstance_c implements
-        JifFieldInstance {
+public class JifFieldInstance_c extends FieldInstance_c
+        implements JifFieldInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label label;
@@ -45,9 +45,8 @@ public class JifFieldInstance_c extends FieldInstance_c implements
         // JifSubstClassType_c.fields() can be removed.
         return super.equalsImpl(jfi)
 //                && ts.equals(label, jfi.label())
-                && hasInitializer == jfi.hasInitializer()
-                && (hasInitializer ? ts.equals(initializer, jfi.initializer())
-                        : true);
+                && hasInitializer == jfi.hasInitializer() && (hasInitializer
+                        ? ts.equals(initializer, jfi.initializer()) : true);
     }
 
     @Override

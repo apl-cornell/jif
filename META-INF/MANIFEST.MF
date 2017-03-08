@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jif
+Bundle-SymbolicName: jif
+Bundle-Version: 3.4.2
+Bundle-Vendor: Jif project group
+Fragment-Host: polyglot;bundle-version="[2.7.0,2.8.0)"
+Export-Package: jif,
+ jif.ast,
+ jif.bin,
+ jif.extension,
+ jif.lang,
+ jif.net,
+ jif.parse,
+ jif.runtime,
+ jif.translate,
+ jif.types,
+ jif.types.hierarchy,
+ jif.types.label,
+ jif.types.principal,
+ jif.visit
+Eclipse-BundleShape: dir

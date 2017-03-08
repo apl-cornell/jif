@@ -52,8 +52,8 @@ public class JifDel_c extends JLDel_c implements JifDel {
 
     @Override
     public void translate(CodeWriter w, Translator tr) {
-        throw new InternalCompilerError("cannot translate " + node()
-                + "; still has a Jif extension");
+        throw new InternalCompilerError(
+                "cannot translate " + node() + "; still has a Jif extension");
     }
 
     @Override

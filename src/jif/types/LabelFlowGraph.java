@@ -46,8 +46,8 @@ public class LabelFlowGraph extends Graph {
     /*
      * fields for Jif option -report
      */
-    public static final Collection<String> flowgraphtopic = CollectionUtil
-            .list(Topics.labelFlow);
+    public static final Collection<String> flowgraphtopic =
+            CollectionUtil.list(Topics.labelFlow);
     // different levels of details
     public static final int messageOnly = 1; // concise path info
     public static final int detailedMessage = 2; // detailed path info, including explanation of each constraint
@@ -62,9 +62,8 @@ public class LabelFlowGraph extends Graph {
             FailedConstraintSnapshot snapshot) {
         tr = t;
         generated = false;
-        root =
-                new LabelNode("ROOT", new VarLabel_c("ROOT", "fake label",
-                        null, null)); // root is just serves as the start point
+        root = new LabelNode("ROOT",
+                new VarLabel_c("ROOT", "fake label", null, null)); // root is just serves as the start point
 
         files = new HashSet<String>();
         this.jiferror = snapshot;
@@ -152,14 +151,12 @@ public class LabelFlowGraph extends Graph {
         public String getName() {
             if (label == null) System.out.println("NULL!!");
             if (label instanceof VarLabel)
-                return ((VarLabel) label).name()
-                        + (label.position() == null ? "" : "@"
-                                + label.position().toString());
+                return ((VarLabel) label).name() + (label.position() == null
+                        ? "" : "@" + label.position().toString());
             else {
                 return (label.description() == null ? "" : label.description())
-                        + label.toString()
-                        + (label.position() == null ? "" : "@"
-                                + label.position().toString());
+                        + label.toString() + (label.position() == null ? ""
+                                : "@" + label.position().toString());
             }
         }
 
@@ -192,9 +189,8 @@ public class LabelFlowGraph extends Graph {
                 LabelNode n = (LabelNode) node;
                 String linkinfo = ((FlowEdge) outs.get(n)).toDotString();
                 if (n.shouldprint) {
-                    ret +=
-                            this.uid + "->" + n.uid + " [label=\"" + linkinfo
-                                    + "\"];\n";
+                    ret += this.uid + "->" + n.uid + " [label=\"" + linkinfo
+                            + "\"];\n";
                 }
             }
             return ret;
@@ -441,8 +437,9 @@ public class LabelFlowGraph extends Graph {
                     }
 
                     if (!skip
-                            && !snapshot.failedConstraint.env().leq(
-                                    snapshot.bounds.applyTo(leftmost.label),
+                            && !snapshot.failedConstraint.env()
+                                    .leq(snapshot.bounds
+                                            .applyTo(leftmost.label),
                                     snapshot.bounds.applyTo(rightmost.label))) {
                         System.out.println("\n----Start of one path----");
                         System.out.println(leftmost.getName());
@@ -451,24 +448,24 @@ public class LabelFlowGraph extends Graph {
                         for (int i = 1; i < leftpath.size(); i++) {
                             LabelNode next = (LabelNode) leftpath.get(i);
                             edge = (FlowEdge) prev.outs.get(next);
-                            System.out.println("--> ("
-                                    + (detail ? edge.toStringDetail() : edge
-                                            .toString()) + ")");
+                            System.out.println(
+                                    "--> (" + (detail ? edge.toStringDetail()
+                                            : edge.toString()) + ")");
                             System.out.println(next.getName());
                             prev = next;
                         }
                         edge = new FlowEdge(snapshot.failedConstraint);
-                        System.out.println("-> ("
-                                + (detail ? edge.toStringDetail() : edge
-                                        .toString()) + ")");
+                        System.out.println(
+                                "-> (" + (detail ? edge.toStringDetail()
+                                        : edge.toString()) + ")");
                         prev = (LabelNode) rightpath.get(0);
                         System.out.println(prev.getName());
                         for (int i = 1; i < rightpath.size(); i++) {
                             LabelNode next = (LabelNode) rightpath.get(i);
                             edge = (FlowEdge) prev.outs.get(next);
-                            System.out.println("--> ("
-                                    + (detail ? edge.toStringDetail() : edge
-                                            .toString()) + ")");
+                            System.out.println(
+                                    "--> (" + (detail ? edge.toStringDetail()
+                                            : edge.toString()) + ")");
                             System.out.println(next.getName());
                             prev = next;
                         }

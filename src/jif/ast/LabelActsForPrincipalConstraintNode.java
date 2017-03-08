@@ -14,6 +14,6 @@ import jif.types.principal.Principal;
  * a procedure header.
  * </p>
  */
-public interface LabelActsForPrincipalConstraintNode extends
-        ActsForConstraintNode<Label, Principal> {
+public interface LabelActsForPrincipalConstraintNode
+        extends ActsForConstraintNode<Label, Principal> {
 }

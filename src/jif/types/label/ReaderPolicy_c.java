@@ -116,7 +116,7 @@ public class ReaderPolicy_c extends Policy_c implements ReaderPolicy {
     @Override
     public String toString(Set<Label> printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
-        sb.append("->");
+        sb.append("→");
         if (!reader.isTopPrincipal()) sb.append(reader.toString());
         return sb.toString();
     }

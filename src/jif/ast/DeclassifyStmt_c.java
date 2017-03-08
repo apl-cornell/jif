@@ -7,7 +7,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>DeclassifyStmt</code> interface.
  */
-public class DeclassifyStmt_c extends DowngradeStmt_c implements DeclassifyStmt {
+public class DeclassifyStmt_c extends DowngradeStmt_c
+        implements DeclassifyStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated

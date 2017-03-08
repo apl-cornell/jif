@@ -41,9 +41,8 @@ public class JifInstanceofExt extends JifExprExt {
         A = (JifContext) A.pushBlock();
         A.setPc(Xe.N(), lc);
         PathMap Xct =
-                ts.labelTypeCheckUtil().labelCheckType(
-                        ioe.compareType().type(), lc, throwTypes,
-                        ioe.compareType().position());
+                ts.labelTypeCheckUtil().labelCheckType(ioe.compareType().type(),
+                        lc, throwTypes, ioe.compareType().position());
         A = (JifContext) A.pop();
         PathMap X = Xe.N(ts.notTaken()).join(Xct);
 

@@ -97,9 +97,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 // add constructor
                 cb = cb.addMember(produceConstructor(jpt, rw));
                 if (hasDefaultConstructor) {
-                    cb =
-                            cb.addMember(produceDefaultConstructorInvoker(jpt,
-                                    rw, defaultConstructorExceptions));
+                    cb = cb.addMember(produceDefaultConstructorInvoker(jpt, rw,
+                            defaultConstructorExceptions));
                 }
                 // add initializer method (which is called from every
                 // translated constructer.
@@ -122,10 +121,9 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                             String paramFieldName =
                                     ParamToJavaExpr_c.paramFieldName(pi);
                             TypeNode tn = typeNodeForParam(pi, rw);
-                            cb =
-                                    cb.addMember(rw.qq().parseMember(
-                                            "private final %T %s;", tn,
-                                            paramFieldName));
+                            cb = cb.addMember(
+                                    rw.qq().parseMember("private final %T %s;",
+                                            tn, paramFieldName));
                         }
                     }
                 }
@@ -139,19 +137,16 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                 ClassBody implBody =
                         rw.java_nf().ClassBody(Position.compilerGenerated(),
                                 new ArrayList<ClassMember>(2));
-                implBody =
-                        implBody.addMember(produceInstanceOfMethod(jpt, rw,
-                                true));
+                implBody = implBody
+                        .addMember(produceInstanceOfMethod(jpt, rw, true));
                 implBody = implBody.addMember(produceCastMethod(jpt, rw));
 
-                Id name =
-                        rw.java_nf().Id(Position.compilerGenerated(),
-                                interfaceClassImplName(n.name()));
-                ClassDecl implDecl =
-                        rw.java_nf().ClassDecl(Position.compilerGenerated(),
-                                n.flags().clearInterface().Abstract(), name,
-                                null, Collections.<TypeNode> emptyList(),
-                                implBody);
+                Id name = rw.java_nf().Id(Position.compilerGenerated(),
+                        interfaceClassImplName(n.name()));
+                ClassDecl implDecl = rw.java_nf().ClassDecl(
+                        Position.compilerGenerated(),
+                        n.flags().clearInterface().Abstract(), name, null,
+                        Collections.<TypeNode> emptyList(), implBody);
                 rw.addAdditionalClassDecl(implDecl);
 
                 // add getters for params to the interface
@@ -159,9 +154,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                     String paramFieldNameGetter =
                             ParamToJavaExpr_c.paramFieldNameGetter(pi);
                     TypeNode tn = typeNodeForParam(pi, rw);
-                    cb =
-                            cb.addMember(rw.qq().parseMember("%T %s();", tn,
-                                    paramFieldNameGetter));
+                    cb = cb.addMember(rw.qq().parseMember("%T %s();", tn,
+                            paramFieldNameGetter));
                 }
 
             }
@@ -169,7 +163,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         rw.leavingClass();
         return rw.java_nf().ClassDecl(n.position(), n.flags(), n.id(),
-                n.superClass(), n.interfaces(), cb);
+                n.superClass(), n.interfaces(), cb, n.javadoc());
     }
 
     /**
@@ -184,9 +178,10 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     /**
      * Create methods for static initializations, and add it to cb.
-     * 
+     *
      */
-    protected ClassBody addStaticInitializers(ClassBody cb, JifToJavaRewriter rw) {
+    protected ClassBody addStaticInitializers(ClassBody cb,
+            JifToJavaRewriter rw) {
         if (rw.getStaticInitializations().isEmpty()) {
             return cb;
         }
@@ -199,8 +194,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         } else {
             b = rw.java_nf().Block(Position.compilerGenerated(), inits);
         }
-        return cb.addMember(rw.java_nf().Initializer(
-                Position.compilerGenerated(), Flags.STATIC, b));
+        return cb.addMember(rw.java_nf()
+                .Initializer(Position.compilerGenerated(), Flags.STATIC, b));
     }
 
     /**
@@ -212,7 +207,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
      */
     protected ClassBody addInterfaceParamGetters(ClassBody cb,
             JifPolyType baseClass, JifPolyType jpt, JifToJavaRewriter rw)
-            throws SemanticException {
+                    throws SemanticException {
         // go through the interfaces of cb
         if (!rw.jif_ts().isParamsRuntimeRep(jpt)) {
             // don't bother adding interface methods for classes that don't represent the runtime params (i.e., Jif sig classes)
@@ -238,27 +233,19 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
                         Expr lblExpr = rw.paramToJava(subst.get(pi));
                         if (!rw.jif_ts().isSignature(jpt)) {
                             // it's a real Jif class, so add a real implementation
-                            cb =
-                                    cb.addMember(rw.qq().parseMember(
-                                            "private %T %s;", tn,
-                                            paramFieldName));
-                            cb =
-                                    cb.addMember(rw
-                                            .qq()
-                                            .parseMember(
-                                                    "public final %T %s() { "
-                                                            + " if (this.%s==null) this.%s = %E; "
-                                                            + "return this.%s; }",
-                                                    tn, paramFieldNameGetter,
-                                                    paramFieldName,
-                                                    paramFieldName, lblExpr,
-                                                    paramFieldName));
+                            cb = cb.addMember(rw.qq().parseMember(
+                                    "private %T %s;", tn, paramFieldName));
+                            cb = cb.addMember(rw.qq().parseMember(
+                                    "public final %T %s() { "
+                                            + " if (this.%s==null) this.%s = %E; "
+                                            + "return this.%s; }",
+                                    tn, paramFieldNameGetter, paramFieldName,
+                                    paramFieldName, lblExpr, paramFieldName));
                         } else {
                             // it's just a signature file, add the method sig but nothing else.
-                            cb =
-                                    cb.addMember(rw.qq().parseMember(
-                                            "public final native %T %s();", tn,
-                                            paramFieldNameGetter));
+                            cb = cb.addMember(rw.qq().parseMember(
+                                    "public final native %T %s();", tn,
+                                    paramFieldNameGetter));
                         }
                     }
                 } else if (interf instanceof JifPolyType) {
@@ -339,9 +326,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
     private static TypeNode typeNodeForParam(ParamInstance pi,
             JifToJavaRewriter rw) throws SemanticException {
-        Type paramType =
-                pi.isPrincipal() ? rw.jif_ts().Principal() : rw.jif_ts()
-                        .Label();
+        Type paramType = pi.isPrincipal() ? rw.jif_ts().Principal()
+                : rw.jif_ts().Label();
         return rw.typeToJava(paramType, Position.compilerGenerated());
     }
 
@@ -390,7 +376,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
     /**
      * Returns the formal with id "o" for the object passed to the cast and instanceof methods
      */
-    protected Formal produceObjectFormal(JifPolyType jpt, JifToJavaRewriter rw) {
+    protected Formal produceObjectFormal(JifPolyType jpt,
+            JifToJavaRewriter rw) {
         Position pos = Position.compilerGenerated();
         TypeNode tn = rw.qq().parseType("java.lang.Object");
         Id id = rw.java_nf().Id(pos, "o");
@@ -411,7 +398,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         return formals;
     }
 
-    protected List<Expr> produceParamArgs(JifPolyType jpt, JifToJavaRewriter rw) {
+    protected List<Expr> produceParamArgs(JifPolyType jpt,
+            JifToJavaRewriter rw) {
         List<Expr> args = new ArrayList<Expr>(jpt.params().size() + 1);
         for (ParamInstance pi : jpt.params()) {
             String paramArgName = ParamToJavaExpr_c.paramArgName(pi);
@@ -433,9 +421,8 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
         // add super call.
         List<Expr> superArgs = new ArrayList<Expr>();
         Type superType = jpt.superType();
-        if (superType instanceof JifSubstType
-                && rw.jif_ts().isParamsRuntimeRep(
-                        ((JifSubstType) superType).base())) {
+        if (superType instanceof JifSubstType && rw.jif_ts()
+                .isParamsRuntimeRep(((JifSubstType) superType).base())) {
             JifSubstType superjst = (JifSubstType) jpt.superType();
             JifPolyType superjpt = (JifPolyType) superjst.base();
 
@@ -465,8 +452,7 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
 
         Id name = rw.java_nf().Id(Position.compilerGenerated(), jpt.name());
         return rw.java_nf().ConstructorDecl(Position.compilerGenerated(),
-                Flags.PUBLIC, name, formals,
-                Collections.<TypeNode> emptyList(),
+                Flags.PUBLIC, name, formals, Collections.<TypeNode> emptyList(),
                 rw.java_nf().Block(Position.compilerGenerated(), inits));
     }
 
@@ -483,19 +469,16 @@ public class ClassDeclToJavaExt_c extends ToJavaExt_c {
             JifToJavaRewriter rw, List<? extends Type> throwTypes) {
         // add arguments for params.
         if (throwTypes == null || throwTypes.isEmpty()) {
-            return rw.qq().parseMember(
-                    "public void " + DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME
-                            + "() {" + "this." + constructorTranslatedName(ct)
-                            + "();" + "}");
+            return rw.qq().parseMember("public void "
+                    + DEFAULT_CONSTRUCTOR_INVOKER_METHOD_NAME + "() {" + "this."
+                    + constructorTranslatedName(ct) + "();" + "}");
         }
         List<TypeNode> typeNodes = new ArrayList<TypeNode>(throwTypes.size());
         for (Type t : throwTypes) {
-            Id name =
-                    rw.java_nf().Id(Position.compilerGenerated(),
-                            t.toClass().name());
-            TypeNode tn =
-                    rw.java_nf()
-                            .AmbTypeNode(Position.compilerGenerated(), name);
+            Id name = rw.java_nf().Id(Position.compilerGenerated(),
+                    t.toClass().name());
+            TypeNode tn = rw.java_nf().AmbTypeNode(Position.compilerGenerated(),
+                    name);
             typeNodes.add(tn);
         }
         return rw.qq().parseMember(

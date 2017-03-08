@@ -134,19 +134,17 @@ public class AccessPathField extends AccessPath {
         try {
             finst = ts.findField(targetType, fieldName);
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Field " + fieldName
-                    + " not found in " + targetType);
+            throw new InternalCompilerError(
+                    "Field " + fieldName + " not found in " + targetType);
         }
         if (finst != null) fi = finst;
 
         Label L = ts.labelOfField(fi, A.pc());
-        L =
-                JifInstantiator.instantiate(L, A, path, path.type()
-                        .toReference(), Xt.NV());
+        L = JifInstantiator.instantiate(L, A, path, path.type().toReference(),
+                Xt.NV());
 
-        Type ft =
-                JifInstantiator.instantiate(fi.type(), A, path, path.type()
-                        .toReference(), Xt.NV());
+        Type ft = JifInstantiator.instantiate(fi.type(), A, path,
+                path.type().toReference(), Xt.NV());
         fi = fi.type(ft);
 
         X = X.NV(lc.upperBound(L, X.NV()));
@@ -161,8 +159,9 @@ public class AccessPathField extends AccessPath {
     public void verify(JifContext A) throws SemanticException {
         path.verify(A);
         if (!path.type().isReference()) {
-            throw new SemanticException("Expression " + path
-                    + " used in final access path is not a reference type",
+            throw new SemanticException(
+                    "Expression " + path
+                            + " used in final access path is not a reference type",
                     position());
         }
         FieldInstance found =
@@ -182,8 +181,9 @@ public class AccessPathField extends AccessPath {
                     + " cannot be found in class " + path.type(), position());
         }
         if (!fi.flags().isFinal()) {
-            throw new SemanticException("Field " + fi.name()
-                    + " in access path is not final", position());
+            throw new SemanticException(
+                    "Field " + fi.name() + " in access path is not final",
+                    position());
         }
     }
 

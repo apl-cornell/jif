@@ -17,8 +17,8 @@ import polyglot.visit.NodeVisitor;
 /** An implementation of the <code>AmbPrincipalNode</code> interface,
  * representing an ambiguous conjunctive or disjunctive principal. 
  */
-public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements
-        AmbJunctivePrincipalNode {
+public class AmbJunctivePrincipalNode_c extends PrincipalNode_c
+        implements AmbJunctivePrincipalNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected PrincipalNode left;
@@ -81,13 +81,11 @@ public class AmbJunctivePrincipalNode_c extends PrincipalNode_c implements
 
         Principal p;
         if (this.isConjunction) {
-            p =
-                    ts.conjunctivePrincipal(position(), left.principal(),
-                            right.principal());
+            p = ts.conjunctivePrincipal(position(), left.principal(),
+                    right.principal());
         } else {
-            p =
-                    ts.disjunctivePrincipal(position(), left.principal(),
-                            right.principal());
+            p = ts.disjunctivePrincipal(position(), left.principal(),
+                    right.principal());
         }
         return nf.CanonicalPrincipalNode(position(), p);
     }

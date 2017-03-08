@@ -44,8 +44,8 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
     }
 
     @Override
-    protected Stmt checkBody(LabelChecker lc, JifContext A,
-            Label downgradeFrom, Label downgradeTo) throws SemanticException {
+    protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom,
+            Label downgradeTo) throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext Abody = bodyContext(lc, A, downgradeFrom, downgradeTo);
 
@@ -86,8 +86,8 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
 
         PathMap X = Xe.N(ts.notTaken()).join(X1).join(X2);
         X = X.NV(ts.notTaken());
-        return (Stmt) updatePathMap(
-                body.cond(e).consequent(S1).alternative(S2), X);
+        return (Stmt) updatePathMap(body.cond(e).consequent(S1).alternative(S2),
+                X);
 
     }
 
@@ -105,14 +105,14 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
     @Override
     protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc,
             Label downgradeFrom, boolean boundSpecified)
-            throws SemanticException {
+                    throws SemanticException {
         // No constraint on the pc.
     }
 
     @Override
     protected void checkOneDimenOnly(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifEndorseExprExt.checkOneDimen(lc, A, labelFrom, labelTo, pos, false,
                 false);
     }
@@ -120,7 +120,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
     @Override
     protected void checkAuthority(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifEndorseExprExt.checkAuth(lc, A, labelFrom, labelTo, pos, false,
                 false);
     }
@@ -128,7 +128,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
     @Override
     protected void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifEndorseExprExt.checkRobustEndorse(lc, A, labelFrom, labelTo, pos,
                 false);
     }
@@ -136,7 +136,7 @@ public class JifCheckedEndorseStmtExt extends JifEndorseStmtExt {
     @Override
     protected void checkAdditionalConstraints(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         final CheckedEndorseStmt_c d = (CheckedEndorseStmt_c) this.node();
         if (d.expr() != null && !(d.expr() instanceof Local)) {
             throw new SemanticDetailedException(

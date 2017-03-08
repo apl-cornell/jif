@@ -51,8 +51,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
         this.baseType = baseType;
         this.expr = expr;
         if (!(expr instanceof Expr) && !(expr instanceof Id)) {
-            throw new InternalCompilerError("wrong type for expr: "
-                    + expr.getClass().getName());
+            throw new InternalCompilerError(
+                    "wrong type for expr: " + expr.getClass().getName());
         }
         this.dims = ListUtil.copy(dims, true);
         this.addDims = addDims;
@@ -193,8 +193,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
                 //this node shouldn't be ambiguous.
                 throw new SemanticDetailedException(
                         "Not enough parameters for parameterized type " + pt
-                                + ".", "The type " + pt
-                                + " is a parameterized type with "
+                                + ".",
+                        "The type " + pt + " is a parameterized type with "
                                 + pt.params().size()
                                 + " parameters. So, to instantiate this type, "
                                 + "you must supply " + pt.params().size() + "",
@@ -222,9 +222,8 @@ public class AmbNewArray_c extends Expr_c implements AmbNewArray {
 
                 l.add(pn.parameter());
 
-                Type base =
-                        ts.instantiate(baseType.position(),
-                                pt.instantiatedFrom(), l);
+                Type base = ts.instantiate(baseType.position(),
+                        pt.instantiatedFrom(), l);
 
                 return nf.NewArray(position(),
                         nf.CanonicalTypeNode(baseType.position(), base), dims,

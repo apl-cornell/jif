@@ -21,10 +21,9 @@ public class ConjunctivePrincipalToJavaExpr_c extends PrincipalToJavaExpr_c {
             if (e == null) {
                 e = pe;
             } else {
-                e =
-                        rw.qq().parseExpr(
-                                ts.PrincipalUtilClassName()
-                                        + ".conjunction(%E, %E)", pe, e);
+                e = rw.qq().parseExpr(
+                        ts.PrincipalUtilClassName() + ".conjunction(%E, %E)",
+                        pe, e);
             }
         }
         return e;

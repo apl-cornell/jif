@@ -1,0 +1,9 @@
+class Principal02 {
+    void m{*<-}() {
+        final principal r = new principal(⊤);
+        int{r->} foo = 5;
+        int{⊤->} bar = 6;
+        bar = foo;
+        foo = bar;
+    }
+}

@@ -1,0 +1,9 @@
+class Disjunction02 {
+    void m{*<-}(principal p, principal q) {
+        final principal r = new principal(p, q);
+        int{p<-q;q<-p} foo = 5;
+        int{r<-} bar = 6;
+        //foo = bar;
+        bar = foo;
+    }
+}

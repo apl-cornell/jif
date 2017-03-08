@@ -59,6 +59,21 @@
     <property name="jifc" location="${bin}/jifc" />
     <property name="jif" location="${bin}/jif" />
 
+    <!-- Set of source files to include in the distribution. -->
+    <fileset id="dist-src-files" dir="${basedir}" defaultexcludes="yes">
+        <include name="src/**" />
+        <exclude name="src/jif/todo.txt" />
+        <include name="rt-src/**" />
+        <include name="lib-src/**" />
+        <include name="sig-src/**" />
+    </fileset>
+
+    <!-- Set of class files that comprise the Jif compiler. -->
+    <!-- (i.e., the contents of jif.jar.) -->
+    <fileset id="dist-class-files" dir="${classes}">
+        <include name="jif/**"/>
+    </fileset>
+
     <!-- Polyglot distribution location -->
     <property name="polyglot.url.prefix"
             value="http://www.cs.cornell.edu/Projects/polyglot/src/polyglot-"/>
@@ -277,7 +292,7 @@
         else="">
         <available file="${jdk.home}/lib/tools.jar" />
     </condition>
-    <copy file="eclipse-classpath.in" tofile=".classpath">
+    <copy file="eclipse/classpath.in" tofile=".classpath">
         <filterset>
         <filter token="TOOLS.JAR" value="${tools.jar-entry}" />
         </filterset>
@@ -286,7 +301,7 @@
 
     <target name="eclipse-check">
     <uptodate property="eclipse.up-to-date" targetfile=".classpath"
-            srcfile="eclipse-classpath.in" />
+            srcfile="eclipse/classpath.in" />
     </target>
 
     <!-- Create jifc script if needed -->
@@ -428,7 +443,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif-runtime" depends="init,configure" description="compile the jif runtime">
         <mkdir dir="${rt-classes}" />
-        <javac source="1.5" target="1.5" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
+        <javac source="1.7" target="1.7" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
             <classpath>
                 <pathelement location="${sig-classes}" />
                 <pathelement location="${lib-classes}" />
@@ -439,7 +454,15 @@ sh ${jif} %CMD_LINE_ARGS%
         <antcall target="jif-runtime-native" />
     </target>
 
-    <target name="jif-runtime-native" description="compile the jif runtime native code">
+    <!--
+         Although jif.skip-native isn't explicitly defined in this build file,
+         the jif-runtime-native target is guarded by jif.skip-native to allow
+         the user to avoid compiling the Jif runtime native code by defining
+         jif.skip-native externally.
+    -->
+    <target name="jif-runtime-native"
+            description="compile the jif runtime native code"
+            unless="jif.skip-native">
         <!-- Compile the headers for jif.lang.NativePM -->
         <mkdir dir="${rt-classes}/jif/native" />
 
@@ -545,6 +568,12 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
             <arg path="${jdk.home}/include" />
             <arg value="-I" />
             <arg path="${jif-runtime-native.java-include-dir.location}" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/${env.OSTYPE}" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/linux" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/solaris" />
             <srcfile />
             <arg value="-o" />
             <targetfile />
@@ -567,6 +596,10 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
             <arg path="${jdk.home}/include" />
             <arg value="-I" />
             <arg path="${jif-runtime-native.java-include-dir.location}" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/${env.OSTYPE}" />
+            <arg value="-I" />
+            <arg path="${jif-runtime-native.java-include-dir.location}/win32" />
             <srcfile />
             <arg value="-o" />
             <targetfile />
@@ -659,6 +692,10 @@ Please try setting the property "jif-runtime-native.java-include-dir" to be the 
       <format property="now" timezone="America/New_York"
           pattern="yyyy-MM-dd HH:mm:ss z" />
     </tstamp>
+    <tstamp>
+      <format property="year" timezone="America/New_York"
+          pattern="yyyy" />
+    </tstamp>
     <property name="jif.version.build" value="${jif.version} (${now})" />
   </target>
 
@@ -733,7 +770,9 @@ public class Version extends polyglot.main.Version {
        ****************************************  -->
 
     <target name="jar" depends="jif">
-        <jar jarfile="${lib}/jif.jar" basedir="${classes}" includes="jif/**" />
+        <jar jarfile="${lib}/jif.jar">
+            <fileset refid="dist-class-files"/>
+        </jar>
         <jar jarfile="${lib}/jifrt.jar" basedir="${rt-classes}" includes="jif/**" />
         <jar jarfile="${lib}/jifsig.jar" basedir="${sig-classes}" includes="jif/**, java/**" />
         <jar jarfile="${lib}/jiflib.jar" basedir="${lib-classes}" includes="jif/**" />
@@ -858,44 +897,56 @@ public class VersionInfo {
       </java>
     </target>
 
-    <target name="dist.zip">
+    <target name="dist.zip" depends="configure-buildstring">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}" />
 
         <!-- Clobber everything so we're in a clean state -->
         <antcall target="clobber" />
 
-        <!-- Copy src files over. -->
+        <!-- Copy files over. -->
         <copy todir="${dist}" includeEmptyDirs="no">
+            <!-- Source code -->
+            <fileset refid="dist-src-files"/>
+
+            <!-- Other files -->
             <fileset dir="${basedir}" defaultexcludes="yes">
-                <include name="src/**" />
-                <exclude name="src/jif/todo.txt" />
-                <include name="rt-src/**" />
-                <include name="lib-src/**" />
-                <include name="sig-src/**" />
+                <!-- Scripts -->
                 <include name="bin/jif" />
                 <include name="bin/jifc.in" />
                 <include name="bin/jc" />
 
-                <!-- only include the battleship example at the moment -->
+                <!-- Examples (only include battleship at the moment) -->
                 <include name="examples/battleship/**" />
                 <include name="examples/*" />
 
+                <!-- Test programs & principals -->
                 <include name="tests/*" />
                 <include name="tests/labelparam/*" />
                 <exclude name="tests/directory/**" />
                 <exclude name="tests/BASELINE-RESULTS" />
                 <include name="tests/jif/principals/**" />
-                <include name="README" />
-                <include name="LICENSE" />
+
+                <!-- Miscellaneous -->
+                <include name="LICENSE.LGPL" />
                 <include name="CHANGES" />
                 <include name="build.xml" />
                 <include name="config.properties.in" />
+                <include name="eclipse/classpath.in"/>
             </fileset>
         </copy>
 
-        <copy file="config.properties.in" tofile="${dist}/config.properties" />
-        <copy file="eclipse-classpath.in" tofile="${dist}/eclipse-classpath.in" />
+        <!-- Generate files from "*.in" templates. -->
+        <copy todir="${dist}">
+            <fileset dir="${basedir}" includes="*.in"/>
+            <mapper type="glob" from="*.in" to="*"/>
+            <filterset>
+                <filter token="YEAR" value="${year}"/>
+                <filter token="VERSION" value="${jif.version}"/>
+                <filter token="POLYGLOT_VERSION"
+                        value="${polyglot.download.version}"/>
+            </filterset>
+        </copy>
 
         <!-- Create the Javadoc, and copy the documentation -->
         <antcall target="javadoc" />
@@ -1035,6 +1086,7 @@ public class VersionInfo {
     <target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
         <java classname="jflex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
             <classpath refid="standard.classpath" />
+            <arg line="--noinputstreamctor" />
             <arg line="${jflex.file}" />
         </java>
     </target>
@@ -1158,7 +1210,12 @@ public class VersionInfo {
         <ant inheritAll="false"
                 antfile="${dist}/${sub-ant.dir}/build.xml"
                 dir="${dist}/${sub-ant.dir}"
-                target="${sub-ant.target}" />
+                target="${sub-ant.target}">
+            <!-- Hack: pass down the downloaded Polyglot version in case we are
+                 building a distribution. -->
+            <property name="polyglot.download.version"
+                    value="${polyglot.download.version}"/>
+        </ant>
     </target>
 
 </project>

@@ -33,13 +33,14 @@ public class TypeSubstitutor {
     }
 
     public Type rewriteType(Type t) throws SemanticException {
-        if (t instanceof LabeledType && recurseIntoLabeledType((LabeledType) t)) {
+        if (t instanceof LabeledType
+                && recurseIntoLabeledType((LabeledType) t)) {
             LabeledType lt = (LabeledType) t;
             Label L = lt.labelPart();
             Type bt = lt.typePart();
             return lt.labelPart(rewriteLabel(L)).typePart(rewriteType(bt));
-        } else if (t instanceof ArrayType
-                && recurseIntoArrayType((ArrayType) t)) {
+        } else
+            if (t instanceof ArrayType && recurseIntoArrayType((ArrayType) t)) {
             ArrayType at = (ArrayType) t;
             return at.base(rewriteType(at.base()));
         } else if (t instanceof JifSubstType

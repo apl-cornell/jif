@@ -20,8 +20,8 @@ import polyglot.util.SerialVersionUID;
 
 /** An implementation of the <code>JifMethodInstance</code> interface.
  */
-public class JifMethodInstance_c extends MethodInstance_c implements
-        JifMethodInstance {
+public class JifMethodInstance_c extends MethodInstance_c
+        implements JifMethodInstance {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Label pcBound;
@@ -158,14 +158,16 @@ public class JifMethodInstance_c extends MethodInstance_c implements
     @Override
     public boolean isCanonical() {
         if (!(super.isCanonical() && pcBound.isCanonical()
-                && returnLabel.isCanonical() && listIsCanonical(constraints) && formalTypes != null)) {
+                && returnLabel.isCanonical() && listIsCanonical(constraints)
+                && formalTypes != null)) {
             return false;
         }
 
         JifTypeSystem jts = (JifTypeSystem) typeSystem();
         // also need to make sure that every formal type is labeled with an arg label
         for (Type t : formalTypes()) {
-            if (!jts.isLabeled(t) || !(jts.labelOfType(t) instanceof ArgLabel)) {
+            if (!jts.isLabeled(t)
+                    || !(jts.labelOfType(t) instanceof ArgLabel)) {
                 return false;
             }
         }

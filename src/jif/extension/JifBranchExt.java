@@ -39,21 +39,19 @@ public class JifBranchExt extends JifStmtExt_c {
         Label gotoLabel = A.gotoLabel(bs.kind(), bs.label());
 
         if (gotoLabel == null) {
-            throw new InternalCompilerError("Can't find target for "
-                    + bs.kind() + " " + bs.label());
+            throw new InternalCompilerError(
+                    "Can't find target for " + bs.kind() + " " + bs.label());
         }
 
         lc.constrain(
-                new NamedLabel(
-                        "pc",
+                new NamedLabel("pc",
                         "the information that may be revealed by control reaching this program point",
                         pc),
                 LabelConstraint.LEQ,
-                new NamedLabel(
-                        "pc_target",
+                new NamedLabel("pc_target",
                         "upper bound on information that should be revealed by control reaching the target program point",
-                        gotoLabel), A.labelEnv(), bs.position(),
-                new ConstraintMessage() {
+                        gotoLabel),
+                A.labelEnv(), bs.position(), new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "More information may be revealed by "

@@ -36,9 +36,8 @@ public class JifArrayAccessExt extends JifExprExt {
         JifNodeFactory nf = (JifNodeFactory) lc.nodeFactory();
         ArrayAccess ae = (ArrayAccess) node();
         Position pos = ae.position();
-        ArrayAccessAssign aae =
-                nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN,
-                        nf.IntLit(pos, IntLit.INT, 1));
+        ArrayAccessAssign aae = nf.ArrayAccessAssign(pos, ae, Assign.ADD_ASSIGN,
+                nf.IntLit(pos, IntLit.INT, 1));
 
         aae = (ArrayAccessAssign) lc.labelCheck(aae);
 

@@ -83,9 +83,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
 
         addReturnConstraints(Li, X, ci, lc, ts.Void());
 
-        mn =
-                (JifConstructorDecl) updatePathMap(
-                        mn.formals(formals).body(body), X);
+        mn = (JifConstructorDecl) updatePathMap(mn.formals(formals).body(body),
+                X);
 
         return mn;
     }
@@ -94,7 +93,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
      * Utility method to get the set of field instances of final fields of
      * the given <code>ReferenceType</code> that do not have an initializer.
      */
-    protected static Set<JifFieldInstance> uninitFinalFields(ReferenceType type) {
+    protected static Set<JifFieldInstance> uninitFinalFields(
+            ReferenceType type) {
         Set<JifFieldInstance> s = new LinkedHashSet<JifFieldInstance>();
 
         @SuppressWarnings("unchecked")
@@ -191,8 +191,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
 
                 if (s instanceof ConstructorCall) {
                     ConstructorCall ccs = (ConstructorCall) s;
-                    boolean wasDangerousSuperCall =
-                            processConstructorCall(ccs, lc, ci, uninitFinalVars);
+                    boolean wasDangerousSuperCall = processConstructorCall(ccs,
+                            lc, ci, uninitFinalVars);
                     if (wasDangerousSuperCall) {
                         preDangerousSuperCall = false;
                     }
@@ -271,8 +271,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
             public Node leave(Node old, Node n, NodeVisitor v) {
                 if (n instanceof Call) {
                     Call c = (Call) n;
-                    if (c.target() instanceof Expr
-                            && JifUtil.effectiveExpr((Expr) c.target()) instanceof Special) {
+                    if (c.target() instanceof Expr && JifUtil.effectiveExpr(
+                            (Expr) c.target()) instanceof Special) {
                         result[0] = true;
                     }
 
@@ -282,8 +282,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                             result[0] = true;
                         }
                     }
-                } else if (n instanceof Assign
-                        && JifUtil.effectiveExpr(((Assign) n).right()) instanceof Special) {
+                } else if (n instanceof Assign && JifUtil.effectiveExpr(
+                        ((Assign) n).right()) instanceof Special) {
                     result[0] = true;
                 }
                 return n;
@@ -293,9 +293,9 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
         return result[0];
     }
 
-    private boolean processConstructorCall(ConstructorCall ccs,
-            LabelChecker lc, JifConstructorInstance ci,
-            Set<JifFieldInstance> uninitFinalVars) throws SemanticException {
+    private boolean processConstructorCall(ConstructorCall ccs, LabelChecker lc,
+            JifConstructorInstance ci, Set<JifFieldInstance> uninitFinalVars)
+                    throws SemanticException {
         JifTypeSystem ts = lc.jifTypeSystem();
         boolean wasDangerousSuperCall = false;
 
@@ -334,9 +334,10 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                 // We must make sure that all final variables of
                 // this class are initialized before the super call.
                 for (JifFieldInstance fi : uninitFinalVars) {
-                    throw new SemanticDetailedException("Final field \""
-                            + fi.name() + "\" must be initialized before "
-                            + "calling the superclass constructor.",
+                    throw new SemanticDetailedException(
+                            "Final field \"" + fi.name()
+                                    + "\" must be initialized before "
+                                    + "calling the superclass constructor.",
                             "All final fields of a class must "
                                     + "be initialized before the superclass "
                                     + "constructor is called, to prevent "
@@ -345,14 +346,16 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
                                     + "final field \"" + fi.name()
                                     + "\" needs to "
                                     + "be initialized before the superclass "
-                                    + "constructor call.", ccs.position());
+                                    + "constructor call.",
+                            ccs.position());
                 }
             }
         }
         return wasDangerousSuperCall;
     }
 
-    private void setEndOfInitChecking(LabelChecker lc, JifConstructorInstance ci) {
+    protected void setEndOfInitChecking(LabelChecker lc,
+            JifConstructorInstance ci) {
         JifContext A = lc.context();
         A.setCheckingInits(false);
         A.setConstructorReturnLabel(null);
@@ -400,8 +403,8 @@ public class JifConstructorDeclExt extends JifProcedureDeclExt_c {
 
             if (!(ass.operator() == Assign.ASSIGN
                     && f.target() instanceof Special
-                    && ((Special) f.target()).kind() == Special.THIS && assFi
-                    .flags().isFinal())) {
+                    && ((Special) f.target()).kind() == Special.THIS
+                    && assFi.flags().isFinal())) {
                 // assignment to something other than a final field of this.
                 continue;
             }

@@ -38,9 +38,8 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
             Type t = tn.type();
             if (t instanceof JifClassType) {
                 JifTypeSystem ts = (JifTypeSystem) t.typeSystem();
-                Set<LocalInstance> lis =
-                        ts.labelTypeCheckUtil().localInstancesUsed(
-                                (JifClassType) t);
+                Set<LocalInstance> lis = ts.labelTypeCheckUtil()
+                        .localInstancesUsed((JifClassType) t);
                 for (LocalInstance li : lis) {
                     checkLocalInstanceInit(li, dfIn, tn.position());
                 }
@@ -54,14 +53,14 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
                         .entrySet()) {
                     if (e.getKey() instanceof FieldInstance
                             && ((FieldInstance) e.getKey()).flags().isFinal()
-                            && !((FieldInstance) e.getKey()).flags().isStatic()) {
+                            && !((FieldInstance) e.getKey()).flags()
+                                    .isStatic()) {
                         // we have a final non-static field                           
                         FieldInstance fi = (FieldInstance) e.getKey();
                         AssignmentStatus initCount = e.getValue();
                         if (!initCount.definitelyAssigned) {
                             throw new SemanticDetailedException(
-                                    "Final field \""
-                                            + fi.name()
+                                    "Final field \"" + fi.name()
                                             + "\" must be initialized before "
                                             + "calling the superclass constructor.",
                                     "All final fields of a class must "
@@ -69,12 +68,11 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
                                             + "constructor is called, to prevent "
                                             + "ancestor classes from reading "
                                             + "uninitialized final fields. The "
-                                            + "final field \""
-                                            + fi.name()
+                                            + "final field \"" + fi.name()
                                             + "\" needs to "
                                             + "be initialized before the superclass "
-                                            + "constructor call.", cc
-                                            .position());
+                                            + "constructor call.",
+                                    cc.position());
                         }
                     }
                 }

@@ -15,6 +15,7 @@ import polyglot.ast.ConstructorDecl_c;
 import polyglot.ast.Ext;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
+import polyglot.ast.Javadoc;
 import polyglot.ast.Node;
 import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
@@ -35,8 +36,8 @@ import polyglot.visit.TypeChecker;
  */
 @Deprecated
 // XXX should be replaced with extension
-public class JifConstructorDecl_c extends ConstructorDecl_c implements
-        JifConstructorDecl {
+public class JifConstructorDecl_c extends ConstructorDecl_c
+        implements JifConstructorDecl {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected LabelNode startLabel;
@@ -47,16 +48,18 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     public JifConstructorDecl_c(Position pos, Flags flags, Id name,
             LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
             List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body) {
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc) {
         this(pos, flags, name, startLabel, returnLabel, formals, throwTypes,
-                constraints, body, null);
+                constraints, body, javadoc, null);
     }
 
     public JifConstructorDecl_c(Position pos, Flags flags, Id name,
             LabelNode startLabel, LabelNode returnLabel, List<Formal> formals,
             List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body, Ext ext) {
-        super(pos, flags, name, formals, throwTypes, body, ext);
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc, Ext ext) {
+        super(pos, flags, name, formals, throwTypes, body, javadoc, ext);
         this.startLabel = startLabel;
         this.returnLabel = returnLabel;
         this.constraints = ListUtil.copy(constraints, true);
@@ -250,11 +253,11 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     /**
      * Checks that if there is an explicit constructor call in the constructor
      * body that the call is all right.
-     * 
+     *
      * In particular, if this is a java class or one of the ancestors of this
      * class is "untrusted" then the explicit constructor call must be
      * the first statement in the constructor body.
-     * 
+     *
      * Moreover, if this is a Jif class, but the superclass is not a Jif class,
      * then first statement must be a default constructor call.
      * @throws SemanticException
@@ -288,7 +291,8 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
                     "The first statement of a constructor "
                             + "of a Jif class with an untrusted Java superclass "
                             + "must be an explicit call to the default super constructor,"
-                            + "\"super()\".", false, true);
+                            + "\"super()\".",
+                    false, true);
         } else if (!ts.isSignature(ct) && ts.isSignature(ct.superType())) {
             // this is a Jif class, but it's superclass is a trusted Java class.
             // The first statement must either be a "this(...)" constructor
@@ -306,14 +310,14 @@ public class JifConstructorDecl_c extends ConstructorDecl_c implements
     }
 
     /**
-     * 
+     *
      * @param message
      * @param allowThisCalls if false then first statement must be super(); if true then it may be a call to this(...) or super().
      * @throws SemanticException
      */
     private void checkFirstStmtConstructorCall(String message,
             boolean allowThisCalls, boolean superCallMustBeDefault)
-            throws SemanticException {
+                    throws SemanticException {
         if (body == null) {
             // this must be a native constructor.
             return;

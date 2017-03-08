@@ -115,8 +115,8 @@ public class JifContext_c extends Context_c implements JifContext {
             principal =
                     (ClassType) jlts.typeForName(jifts.PrincipalClassName());
         } catch (SemanticException e) {
-            throw new InternalCompilerError("Cannot find "
-                    + jifts.PrincipalClassName() + " class.", e);
+            throw new InternalCompilerError(
+                    "Cannot find " + jifts.PrincipalClassName() + " class.", e);
         }
 
         Named n;
@@ -248,8 +248,8 @@ public class JifContext_c extends Context_c implements JifContext {
         } else if (actor instanceof Principal) {
             addActsFor((Principal) actor, granter);
         } else {
-            throw new InternalCompilerError("Unexpected ActsForParam type: "
-                    + actor.getClass());
+            throw new InternalCompilerError(
+                    "Unexpected ActsForParam type: " + actor.getClass());
         }
     }
 
@@ -332,8 +332,8 @@ public class JifContext_c extends Context_c implements JifContext {
             if (o instanceof Key) {
                 Key that = (Key) o;
                 return this.kind.equals(that.kind)
-                        && (this.label == that.label || (this.label != null && this.label
-                                .equals(that.label)));
+                        && (this.label == that.label || (this.label != null
+                                && this.label.equals(that.label)));
             }
             return false;
         }
@@ -346,7 +346,8 @@ public class JifContext_c extends Context_c implements JifContext {
     }
 
     @Override
-    public void gotoLabel(polyglot.ast.Branch.Kind kind, String label, Label L) {
+    public void gotoLabel(polyglot.ast.Branch.Kind kind, String label,
+            Label L) {
         if (gotos == null) gotos = new HashMap<Key, Label>();
         gotos.put(new Key(kind, label), L);
     }
@@ -374,9 +375,8 @@ public class JifContext_c extends Context_c implements JifContext {
         if (pc != null) {
             Set<Label> set = new HashSet<Label>();
             set.add(pc);
-            this.pc =
-                    new JoinLabel_c(set, pc.typeSystem(), pc.position(),
-                            new JoinLabelToJavaExpr_c());
+            this.pc = new JoinLabel_c(set, pc.typeSystem(), pc.position(),
+                    new JoinLabelToJavaExpr_c());
             this.pc.setDescription("pc label");
         } else this.pc = pc;
     }
@@ -401,9 +401,8 @@ public class JifContext_c extends Context_c implements JifContext {
         JifOptions opt = (JifOptions) jifts.extensionInfo().getOptions();
         if (opt.authFromProvider()) {
             Position pos = Position.compilerGenerated();
-            PairLabel public_untrusted =
-                    jifts.pairLabel(pos, jifts.bottomConfPolicy(pos),
-                            jifts.topIntegPolicy(pos));
+            PairLabel public_untrusted = jifts.pairLabel(pos,
+                    jifts.bottomConfPolicy(pos), jifts.topIntegPolicy(pos));
             Label provider_integ = jifts.meet(public_untrusted, provider());
             Label L = jifts.writersToReadersLabel(pos, provider_integ);
             return env.triggerTransforms(L).normalize();
@@ -412,12 +411,10 @@ public class JifContext_c extends Context_c implements JifContext {
 
             Set<Label> labels = new LinkedHashSet<Label>();
             for (Principal p : auth) {
-                PairLabel pl =
-                        jifts.pairLabel(
-                                p.position(),
-                                jifts.readerPolicy(p.position(), p,
-                                        jifts.topPrincipal(p.position())),
-                                jifts.topIntegPolicy(p.position()));
+                PairLabel pl = jifts.pairLabel(p.position(),
+                        jifts.readerPolicy(p.position(), p,
+                                jifts.topPrincipal(p.position())),
+                        jifts.topIntegPolicy(p.position()));
                 labels.add(pl);
             }
 
@@ -434,17 +431,15 @@ public class JifContext_c extends Context_c implements JifContext {
         JifOptions opt = (JifOptions) jifts.extensionInfo().getOptions();
         if (opt.authFromProvider()) {
             Position pos = Position.compilerGenerated();
-            return jifts.pairLabel(pos, jifts.bottomConfPolicy(pos), provider()
-                    .integProjection());
+            return jifts.pairLabel(pos, jifts.bottomConfPolicy(pos),
+                    provider().integProjection());
         } else {
             Set<Label> labels = new LinkedHashSet<Label>();
             for (Principal p : authority()) {
-                PairLabel pl =
-                        jifts.pairLabel(
-                                p.position(),
-                                jifts.bottomConfPolicy(p.position()),
-                                jifts.writerPolicy(p.position(), p,
-                                        jifts.topPrincipal(p.position())));
+                PairLabel pl = jifts.pairLabel(p.position(),
+                        jifts.bottomConfPolicy(p.position()),
+                        jifts.writerPolicy(p.position(), p,
+                                jifts.topPrincipal(p.position())));
                 labels.add(pl);
             }
 
@@ -515,7 +510,8 @@ public class JifContext_c extends Context_c implements JifContext {
     public PathMap pathMapForLocal(LocalInstance li, LabelChecker lc) {
         JifTypeSystem ts = lc.jifTypeSystem();
         Label L = null;
-        if (checkedEndorsements != null && checkedEndorsements.containsKey(li)) {
+        if (checkedEndorsements != null
+                && checkedEndorsements.containsKey(li)) {
             L = checkedEndorsements.get(li);
         } else {
             L = ts.labelOfLocal(li, this.pc());

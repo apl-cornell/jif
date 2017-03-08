@@ -335,7 +335,8 @@ public class MeetLabel_c extends Label_c implements MeetLabel {
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         if (components.isEmpty() || substitution.stackContains(this)
                 || !substitution.recurseIntoChildren(this)) {
             return substitution.substLabel(this);

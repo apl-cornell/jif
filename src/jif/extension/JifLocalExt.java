@@ -39,11 +39,13 @@ public class JifLocalExt extends JifExprExt {
         // original constraint was X.NV() <= L
         // simplified to the equivalent constraint A.pc() <= L
         // (equivalent because X.NV == A.pc() join L)
-        lc.constrain(new NamedLabel("pc",
-                "information revealed by reaching this program point", A.pc()),
-                LabelConstraint.LEQ, new NamedLabel("label of local variable "
-                        + li.name(), L), A.labelEnv(), lve.position(),
-                new ConstraintMessage() {
+        lc.constrain(
+                new NamedLabel("pc",
+                        "information revealed by reaching this program point",
+                        A.pc()),
+                LabelConstraint.LEQ,
+                new NamedLabel("label of local variable " + li.name(), L),
+                A.labelEnv(), lve.position(), new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Program counter at increment "
@@ -56,14 +58,10 @@ public class JifLocalExt extends JifExprExt {
                         return "More information may be revealed by the program "
                                 + "reaching this program point "
                                 + "than is allowed to flow to "
-                                + "the local variable "
-                                + li.name()
-                                + ". Because "
-                                + li.name()
+                                + "the local variable " + li.name()
+                                + ". Because " + li.name()
                                 + " is updated at this program point, "
-                                + "the value of "
-                                + li.name()
-                                + " can reveal "
+                                + "the value of " + li.name() + " can reveal "
                                 + "information at level A.pc. But this is more "
                                 + "information than is allowed to flow to "
                                 + li.name() + ".";
@@ -71,8 +69,8 @@ public class JifLocalExt extends JifExprExt {
 
                     @Override
                     public String technicalMsg() {
-                        return "Invalid increment: [Xe.nv <= label("
-                                + li.name() + ")] is not satisfied.";
+                        return "Invalid increment: [Xe.nv <= label(" + li.name()
+                                + ")] is not satisfied.";
                     }
                 });
 

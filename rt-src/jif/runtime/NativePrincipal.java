@@ -106,8 +106,9 @@ public class NativePrincipal implements Principal {
     @Override
     public boolean equals(Principal p) {
         return p != null
-                && (this.name == p.name() || (this.name != null && this.name
-                        .equals(p.name()))) && this.getClass() == p.getClass();
+                && (this.name == p.name()
+                        || (this.name != null && this.name.equals(p.name())))
+                && this.getClass() == p.getClass();
     }
 
     @Override

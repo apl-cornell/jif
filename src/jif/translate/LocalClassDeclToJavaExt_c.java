@@ -5,7 +5,8 @@ import polyglot.ast.Node;
 import polyglot.types.SemanticException;
 import polyglot.util.SerialVersionUID;
 
-public class LocalClassDeclToJavaExt_c extends ToJavaExt_c implements ToJavaExt {
+public class LocalClassDeclToJavaExt_c extends ToJavaExt_c
+        implements ToJavaExt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     @Override

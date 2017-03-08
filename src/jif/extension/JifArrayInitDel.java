@@ -33,10 +33,8 @@ public class JifArrayInitDel extends JifDel_c {
         if (base.isArray()) {
             base = relabelBaseType(base.toArray(), ts);
         }
-        base =
-                ts.labeledType(base.position(), base, ts.freshLabelVariable(
-                        base.position(), "array_base",
-                        "label of base type of array"));
+        base = ts.labeledType(base.position(), base, ts.freshLabelVariable(
+                base.position(), "array_base", "label of base type of array"));
         return type.base(base);
     }
 }

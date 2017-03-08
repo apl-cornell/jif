@@ -40,9 +40,8 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode {
     public JoinLabelNode_c(Position pos, List<LabelComponentNode> components,
             Ext ext) {
         super(pos, ext);
-        this.components =
-                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
-                        components));
+        this.components = Collections.unmodifiableList(
+                new ArrayList<LabelComponentNode>(components));
     }
 
     @Override
@@ -53,19 +52,16 @@ public class JoinLabelNode_c extends AmbLabelNode_c implements JoinLabelNode {
     @Override
     public JoinLabelNode components(List<LabelComponentNode> components) {
         JoinLabelNode_c n = (JoinLabelNode_c) copy();
-        n.components =
-                Collections.unmodifiableList(new ArrayList<LabelComponentNode>(
-                        components));
+        n.components = Collections.unmodifiableList(
+                new ArrayList<LabelComponentNode>(components));
         return n;
     }
 
     protected JoinLabelNode_c reconstruct(List<LabelComponentNode> components) {
         if (!CollectionUtil.equals(components, this.components)) {
             JoinLabelNode_c n = (JoinLabelNode_c) copy();
-            n.components =
-                    Collections
-                            .unmodifiableList(new ArrayList<LabelComponentNode>(
-                                    components));
+            n.components = Collections.unmodifiableList(
+                    new ArrayList<LabelComponentNode>(components));
             return n;
         }
 

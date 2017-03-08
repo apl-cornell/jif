@@ -1,4 +1,4 @@
-Jif 3.4.2
+Jif @VERSION@
 
                          The Jif Language and Compiler
 			 -----------------------------
@@ -62,7 +62,7 @@ also developed at Cornell. Polyglot can be obtained from the web site:
     http://www.cs.cornell.edu/Projects/polyglot
 
 This Jif distribution contains the files polyglot.jar, jflex.jar and
-java_cup.jar from the Polyglot 2.6.1 distribution. These files are
+java_cup.jar from the Polyglot @POLYGLOT_VERSION@ distribution. These files are
 required to build Jif.
 
 This Jif distribution contains some C++ code, used to produce
@@ -234,17 +234,24 @@ helped implement earlier versions.
 Restrictions on use
 -------------------
 
-This free release of the Jif system may be used, modified, and
-redistributed as governed by the license included in the attached file
-LICENSE.
+This release of Jif is governed by the GNU Lesser General Public
+License as described by the following copyright notice.
 
-Jif: Java Information Flow
-Copyright (C) 1999-2012 Andrew C. Myers, Cornell University
+Jif @VERSION@
+Copyright (C) 1999-@YEAR@ Jif project group, Cornell University
 
-This software is distributed in the hope that it will be useful, but
+Jif is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 2.1 of
+the License, or (at your option) any later version.
+
+Jif is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the file
-LICENSE for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+A copy of the GNU Lesser General Public License version 2.1 can
+be found in the file LICENSE.LGPL, included in this distribution.
 
 More information
 ----------------

@@ -20,7 +20,8 @@ public class CanonicalConstraintNode_c extends ConstraintNode_c<Assertion>
         this(pos, constraint, null);
     }
 
-    public CanonicalConstraintNode_c(Position pos, Assertion constraint, Ext ext) {
+    public CanonicalConstraintNode_c(Position pos, Assertion constraint,
+            Ext ext) {
         super(pos, ext);
         this.setConstraint(constraint);
     }

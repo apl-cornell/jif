@@ -69,9 +69,8 @@ public class JifLabelSubst extends ContextVisitor {
 
     protected Node updateNode(Node n) throws SemanticException {
         if (n instanceof ProcedureDecl) {
-            JifProcedureInstance pi =
-                    (JifProcedureInstance) ((ProcedureDecl) n)
-                            .procedureInstance();
+            JifProcedureInstance pi = (JifProcedureInstance) ((ProcedureDecl) n)
+                    .procedureInstance();
             pi.subst(bounds);
         }
         if (n instanceof FieldDecl) {
@@ -101,10 +100,9 @@ public class JifLabelSubst extends ContextVisitor {
             // during solving
             Call c = (Call) n;
             MethodInstance mi;
-            mi =
-                    ts.findMethod(c.target().type().toReference(), c
-                            .methodInstance().name(), c.methodInstance()
-                            .formalTypes(), c.target().type().toClass());
+            mi = ts.findMethod(c.target().type().toReference(),
+                    c.methodInstance().name(), c.methodInstance().formalTypes(),
+                    c.target().type().toClass());
 
             n = c.methodInstance(mi);
         }

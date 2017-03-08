@@ -104,9 +104,8 @@ public class JifNewExt extends JifExprExt {
                 JifFieldInstance jfi = (JifFieldInstance) fi;
                 if (jfi.flags().isFinal() && jfi.flags().isStatic()
                         && jfi.hasInitializer()) {
-                    AccessPathField path =
-                            (AccessPathField) ts.varInstanceToAccessPath(jfi,
-                                    jfi.position());
+                    AccessPathField path = (AccessPathField) ts
+                            .varInstanceToAccessPath(jfi, jfi.position());
                     Param init = jfi.initializer();
                     if (ts.isLabel(jfi.type())) {
                         Label dl = ts.dynamicLabel(jfi.position(), path);
@@ -137,9 +136,7 @@ public class JifNewExt extends JifExprExt {
         boolean npExc = false;
         if (noe.qualifier() == null) {
             newLabel =
-                    ts.freshLabelVariable(
-                            noe.position(),
-                            "new" + ct.name(),
+                    ts.freshLabelVariable(noe.position(), "new" + ct.name(),
                             "label of the reference to the newly created "
                                     + ct.name() + " object, at "
                                     + noe.position());
@@ -163,26 +160,28 @@ public class JifNewExt extends JifExprExt {
                 newLabel = Xs.NV();
                 A.setPc(Xs.NV(), lc);
             } else {
-                newLabel =
-                        ((JifClassType) lc.context().currentClass())
-                                .thisLabel();
+                newLabel = ((JifClassType) lc.context().currentClass())
+                        .thisLabel();
             }
         }
         if (ts.isLabeled(noe.type())) {
             // error messages for equality constraints aren't displayed, so no
             // need to define error messages.
-            lc.constrain(new NamedLabel("new_label",
-                    "label of the reference to the newly created " + ct.name(),
-                    newLabel), LabelConstraint.EQUAL, new NamedLabel(
-                    "declared_label", "declared label of the newly created "
-                            + ct.name(), ts.labelOfType(noe.type())), A
-                    .labelEnv(), noe.position());
+            lc.constrain(
+                    new NamedLabel("new_label",
+                            "label of the reference to the newly created "
+                                    + ct.name(),
+                            newLabel),
+                    LabelConstraint.EQUAL,
+                    new NamedLabel("declared_label",
+                            "declared label of the newly created " + ct.name(),
+                            ts.labelOfType(noe.type())),
+                    A.labelEnv(), noe.position());
         }
 
-        CallHelper helper =
-                lc.createCallHelper(newLabel, noe, ct,
-                        (JifProcedureInstance) noe.constructorInstance(),
-                        noe.arguments(), node().position());
+        CallHelper helper = lc.createCallHelper(newLabel, noe, ct,
+                (JifProcedureInstance) noe.constructorInstance(),
+                noe.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
         helper.checkCall(callLC, throwTypes, npExc);
 

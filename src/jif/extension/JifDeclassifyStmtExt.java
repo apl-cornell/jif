@@ -22,7 +22,7 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt {
     @Override
     protected void checkOneDimenOnly(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifDeclassifyExprExt.checkOneDimen(lc, A, labelFrom, labelTo, pos,
                 false);
     }
@@ -30,14 +30,14 @@ public class JifDeclassifyStmtExt extends JifDowngradeStmtExt {
     @Override
     protected void checkAuthority(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifDeclassifyExprExt.checkAuth(lc, A, labelFrom, labelTo, pos, false);
     }
 
     @Override
     protected void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifDeclassifyExprExt.checkRobustDecl(lc, A, labelFrom, labelTo, pos,
                 false);
     }

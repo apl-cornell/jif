@@ -27,9 +27,8 @@ public class SocketUtil {
         if (ss == null || a == null) return;
         while (true) {
             try {
-                if (DEBUG)
-                    System.out
-                            .println("Listening on port " + ss.getLocalPort());
+                if (DEBUG) System.out
+                        .println("Listening on port " + ss.getLocalPort());
                 Socket s = ss.accept();
                 if (DEBUG) System.out.println("Got socket: " + s.getPort());
                 new Thread(new SocketAcceptorRunner(a, s)).start();
@@ -53,13 +52,11 @@ public class SocketUtil {
         @Override
         public void run() {
             try {
-                if (DEBUG)
-                    System.out.println("Calling accept for socket #"
-                            + s.getPort());
+                if (DEBUG) System.out
+                        .println("Calling accept for socket #" + s.getPort());
                 a.accept(s.getInputStream(), s.getOutputStream());
-                if (DEBUG)
-                    System.out.println("Finished accept for socket #"
-                            + s.getPort());
+                if (DEBUG) System.out
+                        .println("Finished accept for socket #" + s.getPort());
             } catch (Exception e) {
                 // just fail silently
                 if (DEBUG) e.printStackTrace();

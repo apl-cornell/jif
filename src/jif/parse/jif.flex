@@ -10,9 +10,11 @@ import polyglot.lex.*;
 import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
-import polyglot.frontend.FileSource;
-import java.util.HashMap;
+import polyglot.frontend.Source;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
 
 @SuppressWarnings("all")
 %%
@@ -28,8 +30,9 @@ import java.math.BigInteger;
 
 %line
 %column
+%char
 
-%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT
+%state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT, JAVADOC_COMMENT
 
 %{
     StringBuffer sb = new StringBuffer();
@@ -37,19 +40,29 @@ import java.math.BigInteger;
     String path;
     ErrorQueue eq;
     HashMap keywords;
+    Position commentBegin;
 
-    public Lexer_c(java.io.InputStream in, FileSource file, ErrorQueue eq) {
+    public Lexer_c(java.io.InputStream in, Source file, ErrorQueue eq) {
         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
              file, eq);
     }
 
-    public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, Source file, ErrorQueue eq) {
         this(reader);
         this.file = file.name();
         this.path = file.path();
         this.eq = eq;
         this.keywords = new HashMap();
         init_keywords();
+    }
+
+    public Set<String> keywords() {
+	if (keywords == null) {
+	    keywords = new HashMap<>();
+	    init_keywords();
+	}
+
+	return Collections.unmodifiableSet(keywords.keySet());
     }
 
     protected void init_keywords() {
@@ -131,12 +144,13 @@ import java.math.BigInteger;
 
     private Position pos() {
         return new Position(path, file, yyline+1, yycolumn, yyline+1,
-                            yycolumn + yytext().length());
+                            yycolumn + yytext().length(), yychar,
+                            yychar + yytext().length());
     }
 
     private Position pos(int len) {
         return new Position(path, file, yyline+1, yycolumn-len-1, yyline+1,
-                            yycolumn+1);
+                            yycolumn+1, yychar-len-1, yychar);
     }
 
     private Token key(int symbol) {
@@ -251,6 +265,10 @@ import java.math.BigInteger;
         return new StringLiteral(pos(sb.length()), sb.toString(),
                                  sym.STRING_LITERAL);
     }
+	
+	private Token javadoc_token() {
+		return new JavadocToken(pos(sb.length()), sb.toString(), sym.JAVADOC);
+    }
 
     private String chop(int i, int j) {
         return yytext().substring(i,yylength()-j);
@@ -316,6 +334,10 @@ OctalEscape = \\ [0-7]
     /* 3.7 Comments */
     "/*"    { yybegin(TRADITIONAL_COMMENT); }
     "//"    { yybegin(END_OF_LINE_COMMENT); }
+    "/**"   { yybegin(JAVADOC_COMMENT);
+              sb.setLength(0);
+              sb.append(yytext());
+              commentBegin = pos(); }
 
     /* 3.10.4 Character Literals */
     \'      { yybegin(CHARACTER); sb.setLength(0); }
@@ -423,6 +445,18 @@ OctalEscape = \\ [0-7]
 <END_OF_LINE_COMMENT> {
     {LineTerminator}             { yybegin(YYINITIAL); }
     .                            { /* ignore */ }
+}
+
+<JAVADOC_COMMENT> {
+    "*/"                         { yybegin(YYINITIAL);
+    							   sb.append(yytext()); 
+    							   return javadoc_token(); }
+
+    <<EOF>>                      { yybegin(YYINITIAL);
+                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+                                                  "Unclosed Javadoc comment",
+                                                  commentBegin); }
+    [^]                          { sb.append(yytext()); }
 }
 
 <CHARACTER> {

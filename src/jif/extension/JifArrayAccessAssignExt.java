@@ -44,8 +44,8 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
                 new ArrayList<Type>(assign.del().throwTypes(ts));
 
         if (assign.left() != aie) {
-            throw new InternalCompilerError(aie
-                    + " is not the left hand side of " + assign);
+            throw new InternalCompilerError(
+                    aie + " is not the left hand side of " + assign);
         }
 
         Type npe = ts.NullPointerException();
@@ -118,14 +118,15 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
         NamedLabel namedLa =
                 new NamedLabel("La", "Label of the array base type", La);
         lc.constrain(
-                new NamedLabel(
-                        "rhs.nv",
+                new NamedLabel("rhs.nv",
                         "label of successful evaluation of right hand of assignment",
-                        Xrhs.NV())
-                        .join(lc, "lhs.n",
+                        Xrhs.NV()).join(lc,
+                                "lhs.n",
                                 "label of successful evaluation of array access "
-                                        + aie, X.N()), LabelConstraint.LEQ,
-                namedLa, A.labelEnv(), aie.position(), new ConstraintMessage() {
+                                        + aie,
+                                X.N()),
+                LabelConstraint.LEQ, namedLa, A.labelEnv(), aie.position(),
+                new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Label of succesful evaluation of array "
@@ -137,8 +138,7 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
                     @Override
                     public String detailMsg() {
                         return "More information may be revealed by the successul "
-                                + "evaluation of the array access "
-                                + aie
+                                + "evaluation of the array access " + aie
                                 + " and the right hand side of the assignment "
                                 + "than is allowed to flow to elements of the "
                                 + "array. Elements of the array can only "
@@ -155,9 +155,10 @@ public class JifArrayAccessAssignExt extends JifAssignExt {
                 });
 
         lc.constrain(
-                new NamedLabel("Li", "Lower bound for side-effects", A
-                        .currentCodePCBound()), LabelConstraint.LEQ, namedLa, A
-                        .labelEnv(), aie.position(), new ConstraintMessage() {
+                new NamedLabel("Li", "Lower bound for side-effects",
+                        A.currentCodePCBound()),
+                LabelConstraint.LEQ, namedLa, A.labelEnv(), aie.position(),
+                new ConstraintMessage() {
                     @Override
                     public String msg() {
                         return "Effect of assignment to array " + array

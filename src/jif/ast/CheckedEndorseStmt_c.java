@@ -13,8 +13,8 @@ import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>CheckedEndorseStmt</code> interface.
  */
-public class CheckedEndorseStmt_c extends EndorseStmt_c implements
-        CheckedEndorseStmt {
+public class CheckedEndorseStmt_c extends EndorseStmt_c
+        implements CheckedEndorseStmt {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Expr expr;
@@ -58,9 +58,8 @@ public class CheckedEndorseStmt_c extends EndorseStmt_c implements
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr(), v);
-        LabelNode bound =
-                this.bound() == null ? null : ((LabelNode) visitChild(
-                        this.bound(), v));
+        LabelNode bound = this.bound() == null ? null
+                : ((LabelNode) visitChild(this.bound(), v));
         LabelNode label = visitChild(this.label(), v);
         Stmt body = visitChild(this.body(), v);
         return reconstruct(this, expr, bound, label, body);

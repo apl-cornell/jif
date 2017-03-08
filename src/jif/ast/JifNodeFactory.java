@@ -13,6 +13,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.If;
+import polyglot.ast.Javadoc;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.Receiver;
 import polyglot.ast.Stmt;
@@ -20,13 +21,14 @@ import polyglot.ast.TypeNode;
 import polyglot.types.Flags;
 import polyglot.util.Position;
 
-/** The node factory of the Jif extension. 
+/** The node factory of the Jif extension.
  */
 public interface JifNodeFactory extends NodeFactory {
     InstTypeNode InstTypeNode(Position pos, TypeNode type,
             List<ParamNode> params);
 
-    LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type, LabelNode label);
+    LabeledTypeNode LabeledTypeNode(Position pos, TypeNode type,
+            LabelNode label);
 
     AmbNewArray AmbNewArray(Position pos, TypeNode base, Object expr,
             List<Expr> dims, int addDims);
@@ -74,17 +76,20 @@ public interface JifNodeFactory extends NodeFactory {
     JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints, ClassBody body);
+            List<ConstraintNode<Assertion>> constraints, ClassBody body,
+            Javadoc javadoc);
 
     JifMethodDecl JifMethodDecl(Position pos, Flags flags, TypeNode returnType,
             Id name, LabelNode startLabel, List<Formal> arguments,
             LabelNode endLabel, List<TypeNode> exceptions,
-            List<ConstraintNode<Assertion>> constraints, Block body);
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc);
 
     JifConstructorDecl JifConstructorDecl(Position pos, Flags flags, Id name,
-            LabelNode startLabel, LabelNode returnLabel,
-            List<Formal> arguments, List<TypeNode> exceptions,
-            List<ConstraintNode<Assertion>> constraints, Block body);
+            LabelNode startLabel, LabelNode returnLabel, List<Formal> arguments,
+            List<TypeNode> exceptions,
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc);
 
     AmbParam AmbParam(Position pos, Id name);
 
@@ -139,8 +144,8 @@ public interface JifNodeFactory extends NodeFactory {
 
     EndorseStmt EndorseStmt(Position pos, LabelNode label, Stmt body);
 
-    CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e,
-            LabelNode bound, LabelNode label, If body);
+    CheckedEndorseStmt CheckedEndorseStmt(Position pos, Expr e, LabelNode bound,
+            LabelNode label, If body);
 
     EndorseExpr EndorseExpr(Position pos, Expr expr, LabelNode bound,
             LabelNode label);

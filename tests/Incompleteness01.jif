@@ -1,0 +1,19 @@
+public class Incompleteness01 {
+  public static void main{⊤←}(String[] args) {
+    final principal p =
+	new principal ((Alice & Bob) , (Chuck & Dolores));
+    final principal q =
+	new principal ((Alice, Chuck) & (Alice, Dolores)
+	    & (Bob, Chuck) & (Bob, Dolores));
+
+    if (p actsfor q) {
+    } else {
+      throw new Error("failed p actsfor q");
+    }
+
+    if (q actsfor p) {
+    } else {
+      throw new Error("failed q actsfor p");
+    }
+  }
+}

@@ -30,15 +30,15 @@ import polyglot.util.Position;
 public class LabelConstraint extends Constraint {
     /**
      * An equality kind of constraint. That is, the constraint requires that
-     * lhs &lt;= rhs and rhs &lt;= lhs.
+     * lhs ⊑ rhs and rhs ⊑ lhs.
      */
     public static final Kind EQUAL = new Kind(" == ");
 
     /**
      * An inequality kind of constraint. That is, the constraint requires that
-     * lhs &lt;= rhs.
+     * lhs ⊑ rhs.
      */
-    public static final Kind LEQ = new Kind(" <= ");
+    public static final Kind LEQ = new Kind(" ⊑ ");
 
     /**
      * Names for the LHS
@@ -173,8 +173,8 @@ public class LabelConstraint extends Constraint {
             addLEQEqns(eqns, lhsLabel(), rhsLabel());
             addLEQEqns(eqns, rhsLabel(), lhsLabel());
         } else {
-            throw new InternalCompilerError("Inappropriate kind of equation: "
-                    + kind);
+            throw new InternalCompilerError(
+                    "Inappropriate kind of equation: " + kind);
         }
 
         return eqns;
@@ -185,7 +185,8 @@ public class LabelConstraint extends Constraint {
      * Produce equations that require <code>left</code> to be less than or
      * equal to <code>right</code>, and add them to <code>eqns</code>.
      */
-    protected void addLEQEqns(Collection<Equation> eqns, Label left, Label right) {
+    protected void addLEQEqns(Collection<Equation> eqns, Label left,
+            Label right) {
         left = left.simplify();
         right = right.simplify();
         if (left instanceof JoinLabel) {

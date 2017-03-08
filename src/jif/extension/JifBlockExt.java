@@ -48,7 +48,7 @@ public class JifBlockExt extends JifStmtExt_c {
             l.add(s);
 
             if (s instanceof LocalClassDecl)
-            // nothing else required
+                // nothing else required
                 continue;
 
             PathMap Xs = getPathMap(s);
@@ -58,8 +58,8 @@ public class JifBlockExt extends JifStmtExt_c {
             A.setPc(Xs.N(), lc);
 
             if (Report.should_report(jif.Topics.pc, 1)) {
-                Report.report(1, "pc after statement at " + s.position()
-                        + " : " + A.pc().toString());
+                Report.report(1, "pc after statement at " + s.position() + " : "
+                        + A.pc().toString());
             }
 
             Xblock = Xblock.N(ts.notTaken()).join(Xs);

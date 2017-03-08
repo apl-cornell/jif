@@ -100,9 +100,8 @@ public abstract class DowngradeStmt_c extends Stmt_c implements DowngradeStmt {
 
     @Override
     public Node visitChildren(NodeVisitor v) {
-        LabelNode bound =
-                this.bound == null ? null : ((LabelNode) visitChild(this.bound,
-                        v));
+        LabelNode bound = this.bound == null ? null
+                : ((LabelNode) visitChild(this.bound, v));
         LabelNode label = visitChild(this.label, v);
         Stmt body = visitChild(this.body, v);
         return reconstruct(this, bound, label, body);

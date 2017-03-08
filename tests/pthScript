@@ -616,6 +616,13 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
 
     # Exposes a bug in the scheduler.
     MutualDep01A.jif MutualDep01B.jif ;
+
+    # Bugs found in 03be86e and de8e340
+    Disjunction01.jif; Disjunction02.jif;
+    Principal01.jif; Principal02.jif;
+    ConjunctTest05.jif; Label02.jif;
+
+    Protected01.jif Protected01A.jif;
 }
 
 # the robustness test cases. Turn robustness on.

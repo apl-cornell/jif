@@ -44,12 +44,14 @@ public final class MeetConfPolicy extends MeetPolicy implements ConfPolicy {
     }
 
     @Override
-    public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
+    public ConfPolicy join(ConfPolicy p, Set<DelegationPair> s,
+            boolean simplify) {
         return labelUtil.join(this, p, s, simplify);
     }
 
     @Override
-    public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s, boolean simplify) {
+    public ConfPolicy meet(ConfPolicy p, Set<DelegationPair> s,
+            boolean simplify) {
         return labelUtil.meet(this, p, s, simplify);
     }
 }

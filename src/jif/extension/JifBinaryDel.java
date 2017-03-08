@@ -26,10 +26,10 @@ import polyglot.visit.TypeChecker;
 public class JifBinaryDel extends JifDel_c {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
-    public static final Binary.Operator ACTSFOR = new Operator("actsfor",
-            Precedence.RELATIONAL);
-    public static final Binary.Operator EQUIV = new Operator("equiv",
-            Precedence.RELATIONAL);
+    public static final Binary.Operator ACTSFOR =
+            new Operator("actsfor", Precedence.RELATIONAL);
+    public static final Binary.Operator EQUIV =
+            new Operator("equiv", Precedence.RELATIONAL);
     private boolean isAEFatal;
 
     public JifBinaryDel() {
@@ -45,8 +45,10 @@ public class JifBinaryDel extends JifDel_c {
         if ((b.operator() == Binary.LE || b.operator() == EQUIV)
                 && (leftLabel || rightLabel)) {
             if (!(leftLabel && rightLabel)) {
-                throw new SemanticException("The operator " + b.operator()
-                        + " requires both operands to be labels.", b.position());
+                throw new SemanticException(
+                        "The operator " + b.operator()
+                                + " requires both operands to be labels.",
+                        b.position());
             }
 
             // we have a label comparison
@@ -60,11 +62,8 @@ public class JifBinaryDel extends JifDel_c {
                             "An expression used in a label test must be either a final access path, principal parameter or a constant principal",
                             b.left().position());
                 }
-                lhs =
-                        nf.LabelExpr(
-                                b.left().position(),
-                                ts.exprToLabel(ts, b.left(),
-                                        (JifContext) tc.context()));
+                lhs = nf.LabelExpr(b.left().position(), ts.exprToLabel(ts,
+                        b.left(), (JifContext) tc.context()));
                 lhs = (LabelExpr) lhs.visit(tc);
             }
             LabelExpr rhs;
@@ -76,11 +75,8 @@ public class JifBinaryDel extends JifDel_c {
                             "An expression used in a label test must either be a final access path or a \"new label\"",
                             b.right().position());
                 }
-                rhs =
-                        nf.LabelExpr(
-                                b.right().position(),
-                                ts.exprToLabel(ts, b.right(),
-                                        (JifContext) tc.context()));
+                rhs = nf.LabelExpr(b.right().position(), ts.exprToLabel(ts,
+                        b.right(), (JifContext) tc.context()));
                 rhs = (LabelExpr) rhs.visit(tc);
             }
             return b.left(lhs).right(rhs).type(ts.Boolean());
@@ -92,15 +88,17 @@ public class JifBinaryDel extends JifDel_c {
                 ts.isImplicitCastValid(b.right().type(), ts.Principal());
         if (b.operator() == ACTSFOR) {
             if (!leftPrinc && !leftLabel) {
-                throw new SemanticException("The left-hand side of the "
-                        + b.operator() + " must be a label or a principal.", b
-                        .left().position());
+                throw new SemanticException(
+                        "The left-hand side of the " + b.operator()
+                                + " must be a label or a principal.",
+                        b.left().position());
             }
 
             if (!rightPrinc) {
-                throw new SemanticException("The right-hand side of the "
-                        + b.operator() + " must be a principal.", b.right()
-                        .position());
+                throw new SemanticException(
+                        "The right-hand side of the " + b.operator()
+                                + " must be a principal.",
+                        b.right().position());
             }
 
             // We have an actsfor comparison.
@@ -115,14 +113,12 @@ public class JifBinaryDel extends JifDel_c {
                         throw new SemanticException(
                                 "An expression used in a label test must be "
                                         + "either a final access path or a "
-                                        + "\"new label\"", lhs.position());
+                                        + "\"new label\"",
+                                lhs.position());
                     }
 
-                    lhs =
-                            nf.LabelExpr(
-                                    lhs.position(),
-                                    ts.exprToLabel(ts, lhs,
-                                            (JifContext) tc.context()));
+                    lhs = nf.LabelExpr(lhs.position(),
+                            ts.exprToLabel(ts, lhs, (JifContext) tc.context()));
                 }
             }
 
@@ -133,8 +129,9 @@ public class JifBinaryDel extends JifDel_c {
 
         if (b.operator() == EQUIV && (leftPrinc || rightPrinc)) {
             if (!(leftPrinc && rightPrinc)) {
-                throw new SemanticException("The operator " + b.operator()
-                        + " requires both operands to be principals.",
+                throw new SemanticException(
+                        "The operator " + b.operator()
+                                + " requires both operands to be principals.",
                         b.position());
             }
 
@@ -169,8 +166,7 @@ public class JifBinaryDel extends JifDel_c {
 
             // previous line should throw an exception, but throw this just to
             // be safe.
-            throw new SemanticDetailedException(
-                    "Illegal dynamic principal.",
+            throw new SemanticDetailedException("Illegal dynamic principal.",
                     "Only final access paths or principal expressions can be used as a dynamic principal. "
                             + "A final access path is an expression starting with either \"this\" or a final "
                             + "local variable \"v\", followed by zero or more final field accesses. That is, "
@@ -186,10 +182,10 @@ public class JifBinaryDel extends JifDel_c {
                     "A principal used in an actsfor must be runtime-representable.",
                     "Both principals used in an actsfor test must be "
                             + "represented at runtime, since the actsfor test is a dynamic "
-                            + "test. The principal "
-                            + p
+                            + "test. The principal " + p
                             + " is not represented at runtime, and thus cannot be used "
-                            + "in an actsfor test.", expr.position());
+                            + "in an actsfor test.",
+                    expr.position());
         }
     }
 

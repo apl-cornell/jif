@@ -22,8 +22,8 @@ import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>AmbVarLabelNode</code> interface. 
  */
-public class AmbVarLabelNode_c extends AmbLabelNode_c implements
-        AmbVarLabelNode {
+public class AmbVarLabelNode_c extends AmbLabelNode_c
+        implements AmbVarLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Id name;
@@ -124,9 +124,11 @@ public class AmbVarLabelNode_c extends AmbLabelNode_c implements
         }
 
         if (vi instanceof PrincipalInstance) {
-            throw new SemanticException("Cannot use the external principal "
-                    + name + " as a label. (The label \"{" + name
-                    + ": }\" may have " + "been intended.)", this.position());
+            throw new SemanticException(
+                    "Cannot use the external principal " + name
+                            + " as a label. (The label \"{" + name
+                            + ": }\" may have " + "been intended.)",
+                    this.position());
         }
 
         throw new SemanticException(vi + " cannot be used as a label.",

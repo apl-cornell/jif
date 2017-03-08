@@ -76,7 +76,7 @@ class DirLookup[label L] {
 
                 if (!inv.cur.contains(nm)) {
                     if (new label{*inv.retl ; L ; *lb} <= new label{*lb ; L}) { // enforce the invariant dynamically
-                        inv_mutable = new Invariant(retl2);
+                        inv_mutable = new Invariant(retl2, cur2); //XXX haven't assigned cur2!?
                     } else {
                         throw new Error();
                     }
@@ -108,3 +108,17 @@ class DirLookup[label L] {
 
 }
 // vim: ts=4 sw=4
+
+class Invariant[label L] {
+
+    Invariant(DirNode{*retl_} cur_, label{L} retl) {
+        cur = cur_;
+        retl = retl_;
+    }
+
+    DirNode{*retl} cur;
+    label{L} retl;
+}
+
+// If final Invariant i, type of i.cur is DirNode{*i.retl}
+

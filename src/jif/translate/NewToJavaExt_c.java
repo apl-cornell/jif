@@ -50,9 +50,8 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
                 || (ct instanceof JifSubstType && !rw.jif_ts()
                         .isParamsRuntimeRep(((JifSubstType) ct).base()))) {
             // only rewrite creation of classes where params are runtime represented.
-            n =
-                    rw.java_nf().New(n.position(), n.qualifier(),
-                            n.objectType(), n.arguments(), n.body());
+            n = rw.java_nf().New(n.position(), n.qualifier(), n.objectType(),
+                    n.arguments(), n.body());
             return n;
         }
 
@@ -72,19 +71,18 @@ public class NewToJavaExt_c extends ExprToJavaExt_c {
         // use the appropriate string for the constructor invocation.
         if (!rw.jif_ts().isSignature(ct)) {
             String name = ClassDeclToJavaExt_c.constructorTranslatedName(ct);
-            New newexp =
-                    rw.java_nf().New(n.position(), n.qualifier(),
-                            n.objectType(), paramargs, n.body());
+            New newexp = rw.java_nf().New(n.position(), n.qualifier(),
+                    n.objectType(), paramargs, n.body());
             return rw.qq().parseExpr("%E.%s(%LE)", newexp, name, n.arguments());
         } else {
             // ct represents params at runtime, but is a Java class with a
             // Jif signature.
-            List<Expr> allArgs =
-                    new ArrayList<Expr>(paramargs.size() + n.arguments().size());
+            List<Expr> allArgs = new ArrayList<Expr>(
+                    paramargs.size() + n.arguments().size());
             allArgs.addAll(paramargs);
             allArgs.addAll(n.arguments());
-            return rw.java_nf().New(Position.compilerGenerated(),
-                    n.qualifier(), n.objectType(), allArgs, n.body());
+            return rw.java_nf().New(Position.compilerGenerated(), n.qualifier(),
+                    n.objectType(), allArgs, n.body());
         }
     }
 }

@@ -105,9 +105,8 @@ public abstract class DowngradeExpr_c extends Expr_c implements DowngradeExpr {
     @Override
     public Node visitChildren(NodeVisitor v) {
         Expr expr = visitChild(this.expr, v);
-        LabelNode bound =
-                this.bound == null ? null : ((LabelNode) visitChild(this.bound,
-                        v));
+        LabelNode bound = this.bound == null ? null
+                : ((LabelNode) visitChild(this.bound, v));
         LabelNode label = visitChild(this.label, v);
         return reconstruct(this, expr, bound, label);
     }

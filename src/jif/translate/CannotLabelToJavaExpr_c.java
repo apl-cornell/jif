@@ -11,7 +11,7 @@ public class CannotLabelToJavaExpr_c extends LabelToJavaExpr_c {
 
     @Override
     public Expr toJava(Label L, JifToJavaRewriter rw) throws SemanticException {
-        throw new InternalCompilerError(L.position(), "Cannot translate " + L
-                + " to Java.");
+        throw new InternalCompilerError(L.position(),
+                "Cannot translate " + L + " to Java.");
     }
 }

@@ -623,7 +623,7 @@ override class_declaration ::=
                 interfaces_opt:d authority_opt:u constraints_opt:f class_body:e
             {: RESULT = parser.nf.JifClassDecl(parser.pos(n, b),
                                                a, parser.nf.Id(parser.pos(b), b.getIdentifier()),
-                                               p, c, d, u, f, e); :}
+                                               p, c, d, u, f, e, parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 
 override super ::=
@@ -710,7 +710,8 @@ override method_header ::=
             {: RESULT = parser.nf.JifMethodDecl(parser.pos(b,c,c), a,
                         parser.array(b, e.intValue()),
                         parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                                                i, d, r, f, w, null);
+                                                i, d, r, f, w, null,
+                                                parser.javadoc(parser.pos(a), parser.pos(b)));
                if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
              :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c label_opt:i
@@ -720,7 +721,8 @@ override method_header ::=
                         parser.nf.CanonicalTypeNode(parser.pos(b),
                                    parser.ts.Void()),
                                    parser.nf.Id(parser.pos(c), c.getIdentifier()),
-                                                i, d, r, f, w, null);
+                                                i, d, r, f, w, null,
+                                                parser.javadoc(parser.pos(a), parser.pos(b)));
                if (i != null) parser.countAnnotation(parser.PC_BOUND_ANNOTATION, RESULT.position());
             :}
     ;
@@ -779,7 +781,8 @@ override constructor_declaration ::=
                    i = null;
                }
            RESULT = parser.nf.JifConstructorDecl(parser.pos(q, y),
-                             a, b, i, r, c, d, w, e); 
+                             a, b, i, r, c, d, w, e,
+                             parser.javadoc(parser.pos(a), parser.pos(q))); 
         :}
     ;
     
@@ -818,7 +821,7 @@ override constructor_body ::=
 
 explicit_super_constructor_invocation ::=
                     // Stmt
-        SUPER:a LPAREN argument_list_opt:b RPAREN:y SEMICOLON
+        SUPER_:a LPAREN argument_list_opt:b RPAREN:y SEMICOLON
             {: RESULT = parser.nf.SuperCall(parser.pos(a,y), b); :}
     ;
     
@@ -991,7 +994,8 @@ override interface_declaration ::=
                                                a.set(Flags.INTERFACE),
                                                parser.nf.Id(parser.pos(b),
                                                b.getIdentifier()),
-                                               p, null, d, u, f, e); :}
+                                               p, null, d, u, f, e,
+                                               parser.javadoc(parser.pos(a), parser.pos(n))); :}
     ;
 
 override extends_interfaces ::=
@@ -1114,8 +1118,8 @@ primary_no_new_array ::=
 }
 drop { /* no inner classes... */
     class_instance_creation_expression ::=
-        NEW class_type LPAREN argument_list_opt RPAREN
-    |   NEW class_type LPAREN argument_list_opt RPAREN class_body
+        NEW class_or_interface_type LPAREN argument_list_opt RPAREN
+    |   NEW class_or_interface_type LPAREN argument_list_opt RPAREN class_body
     |   primary DOT NEW simple_name LPAREN argument_list_opt RPAREN
     |   primary DOT NEW simple_name LPAREN argument_list_opt RPAREN class_body
     |   name DOT NEW simple_name LPAREN argument_list_opt RPAREN
@@ -1146,7 +1150,7 @@ override array_creation_expression ::=
 
 override field_access ::=
                     // Field
-        SUPER:n DOT IDENTIFIER:a
+        SUPER_:n DOT IDENTIFIER:a
             {: RESULT = parser.nf.Field(parser.pos(a),
                 parser.nf.Super(parser.pos(n)),
                 parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
@@ -1157,7 +1161,7 @@ override field_access ::=
     
 override method_invocation ::=
                     // Call
-       SUPER:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
+       SUPER_:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
             {: RESULT = parser.nf.Call(parser.pos(a,d, b),
                 parser.nf.Super(parser.pos(a)),
                 parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}

@@ -13,8 +13,8 @@ import polyglot.visit.PrettyPrinter;
 
 /** An implementation of the <code>AmbThisLabelNode</code> interface. 
  */
-public class AmbThisLabelNode_c extends AmbLabelNode_c implements
-        AmbThisLabelNode {
+public class AmbThisLabelNode_c extends AmbLabelNode_c
+        implements AmbThisLabelNode {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
 //    @Deprecated

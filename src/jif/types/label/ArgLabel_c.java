@@ -149,10 +149,9 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         // use pointer equality for vi instead of equals
         // to ensure that we don't confuse e.g., local instances
         // with the same name.
-        return (this.ci == that.ci || (this.ci != null && this.ci
-                .equals(that.ci)))
-                && this.vi == that.vi
-                && this.name.equals(that.name);
+        return (this.ci == that.ci
+                || (this.ci != null && this.ci.equals(that.ci)))
+                && this.vi == that.vi && this.name.equals(that.name);
 
     }
 
@@ -174,14 +173,12 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
         printedLabels.add(this);
 
         if (Report.should_report(Report.debug, 2)) {
-            String ub =
-                    upperBound == null ? "-" : upperBound
-                            .toString(printedLabels);
+            String ub = upperBound == null ? "-"
+                    : upperBound.toString(printedLabels);
             return "<arg " + name + " " + ub + ">";
         } else if (Report.should_report(Report.debug, 1)) {
-            String ub =
-                    upperBound == null ? "-" : upperBound
-                            .toString(printedLabels);
+            String ub = upperBound == null ? "-"
+                    : upperBound.toString(printedLabels);
             return "<arg " + nicename() + " " + ub + ">";
         }
         return nicename();
@@ -199,7 +196,8 @@ public class ArgLabel_c extends Label_c implements ArgLabel {
     }
 
     @Override
-    public Label subst(LabelSubstitution substitution) throws SemanticException {
+    public Label subst(LabelSubstitution substitution)
+            throws SemanticException {
         ArgLabel lbl = this;
         if (substitution.recurseIntoChildren(lbl)) {
             if (!substitution.stackContains(this)) {

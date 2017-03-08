@@ -35,13 +35,8 @@ public class MeetLabelToJavaExpr_c extends LabelToJavaExpr_c {
         while (iter.hasNext()) {
             head = iter.next();
             Expr f = rw.labelToJava(head);
-            e =
-                    rw.qq().parseExpr(
-                            "%E.meet(%E, %E)",
-                            e,
-                            f,
-                            rw.java_nf().BooleanLit(
-                                    Position.compilerGenerated(), simplify));
+            e = rw.qq().parseExpr("%E.meet(%E, %E)", e, f, rw.java_nf()
+                    .BooleanLit(Position.compilerGenerated(), simplify));
         }
         return e;
     }

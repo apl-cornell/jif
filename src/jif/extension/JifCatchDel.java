@@ -29,7 +29,8 @@ public class JifCatchDel extends JifDel_c {
                     "Subclasses of java.lang.Error can not be caught in Jif "
                             + "programs, as the Jif compiler treats Errors as unchecked exceptions, and "
                             + "does not track the information flow that may arise from raising "
-                            + "and catching them.", c.position());
+                            + "and catching them.",
+                    c.position());
         }
         if (jts.Throwable().equals(catchType)) {
             throw new SemanticDetailedException(

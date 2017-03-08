@@ -31,8 +31,8 @@ public abstract class AccessPathRoot extends AccessPath {
 
     @Override
     public PathMap labelcheck(JifContext A, LabelChecker lc) {
-        throw new UnsupportedOperationException("Cannot labelcheck an "
-                + this.getClass());
+        throw new UnsupportedOperationException(
+                "Cannot labelcheck an " + this.getClass());
     }
 
     @Override

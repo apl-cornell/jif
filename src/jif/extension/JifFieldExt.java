@@ -43,9 +43,8 @@ public class JifFieldExt extends JifExprExt {
         lc.nodeFactory();
         Field fe = (Field) node();
         Position pos = fe.position();
-        FieldAssign fae =
-                nf.FieldAssign(pos, fe, Assign.ADD_ASSIGN,
-                        nf.IntLit(pos, IntLit.INT, 1));
+        FieldAssign fae = nf.FieldAssign(pos, fe, Assign.ADD_ASSIGN,
+                nf.IntLit(pos, IntLit.INT, 1));
 
         fae = (FieldAssign) lc.labelCheck(fae);
 
@@ -56,21 +55,21 @@ public class JifFieldExt extends JifExprExt {
     {
         JifContext A = lc.jifContext();
     JifTypeSystem ts = lc.jifTypeSystem();
-
+    
     Field fe = (Field) node();
-
+    
     Type npe = ts.NullPointerException();
     Type are = ts.ArithmeticException();
-
+    
     if (fe.target() instanceof TypeNode) {
         // static field
-
+    
     }
-
+    
     Expr target = (Expr) lc.context(A).labelCheck(fe.target());
     PathMap Xe = X(target);
     PathMap Xp;
-
+    
     if (((JifFieldDel)node().del()).targetIsNeverNull()) {
             // target is never null, so no NPE can be thrown
         Xp = Xe;
@@ -78,25 +77,25 @@ public class JifFieldExt extends JifExprExt {
     else {
         Xp = Xe.exc(Xe.NV(), npe);
     }
-
+    
     PathMap Xr = ts.pathMap();
     Xr = Xr.N(Xp.N());
     Xr = Xr.NV(Xp.N());
-
+    
     PathMap X = Xe.join(Xr);
-
+    
     if (target instanceof Special)
         X = Xr;
-
+    
     // Must be done after visiting target to get PC right.
     FieldInstance fi = fe.fieldInstance();
     Label L = ts.labelOfField(fi, A.pc());
     //FIXME: consider the case of "special" target.
     JifContext A1 = A.enterObj(targetType(ts, A, target), X(target).NV());
     L = A1.instantiate(L);
-
+    
     X = Xe.set(Path.NV, Xe.NV().join(L));
-
+    
     if (target instanceof Special && lc.checkingInits()) {
         Label Lr = lc.constructorReturnLabel();
         Label Li = A.entryPC();
@@ -105,12 +104,12 @@ public class JifFieldExt extends JifExprExt {
         if (Li != null)
     	L = L.join(Li);
     }
-
+    
     lc.constrainLE(X.NV(), L, fe.position(),
     	       "Invalid increment: NV of the field container or PC is "
     	       + "more restrictive than the label of field "
     	       + fi.name() + ".");
-
+    
     return X(fe, X);
     }*/
 
@@ -149,13 +148,11 @@ public class JifFieldExt extends JifExprExt {
         if (target instanceof Expr) {
             Label objLabel = getPathMap(target).NV();
 
-            L =
-                    JifInstantiator.instantiate(L, A, (Expr) target,
-                            targetType, objLabel);
+            L = JifInstantiator.instantiate(L, A, (Expr) target, targetType,
+                    objLabel);
 
-            Type ft =
-                    JifInstantiator.instantiate(fi.type(), A, (Expr) target,
-                            targetType, objLabel);
+            Type ft = JifInstantiator.instantiate(fi.type(), A, (Expr) target,
+                    targetType, objLabel);
 
             fe = (Field) fe.type(ft);
         }
@@ -172,8 +169,8 @@ public class JifFieldExt extends JifExprExt {
 
         if (!(fe.target() instanceof Expr)) {
             JifContext A = lc.context();
-            return (Receiver) updatePathMap(fe.target(), ts.pathMap().N(A.pc())
-                    .NV(A.pc()));
+            return (Receiver) updatePathMap(fe.target(),
+                    ts.pathMap().N(A.pc()).NV(A.pc()));
         }
 
         Expr target = (Expr) lc.labelCheck(fe.target());
@@ -200,15 +197,15 @@ public class JifFieldExt extends JifExprExt {
                     }
                     if (found)
                         break;
-
+                
                     rt = (ReferenceType) rt.superType();
                 } while (rt != null);*/
                 try {
                     FieldInstance fi = ts.findField(rt, name);
                     rt = fi.container();
                 } catch (SemanticException x) {
-                    throw new InternalCompilerError("Cannot find the field "
-                            + name + " in " + rt, x);
+                    throw new InternalCompilerError(
+                            "Cannot find the field " + name + " in " + rt, x);
                 }
             }
         } else {

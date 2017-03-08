@@ -57,7 +57,8 @@ public class JifNewDel extends JifDel_c implements NewOps {
 
     public boolean qualIsNeverNull() {
         Expr r = ((New) node()).qualifier();
-        return (r == null || r instanceof Special || isNPEfatal || isQualNeverNull);
+        return (r == null || r instanceof Special || isNPEfatal
+                || isQualNeverNull);
     }
 
     /**

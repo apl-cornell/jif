@@ -57,11 +57,9 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
             downgradeFrom = ds.bound().label();
         } else {
             boundSpecified = false;
-            downgradeFrom =
-                    lc.typeSystem()
-                            .freshLabelVariable(ds.position(),
-                                    "downgrade_from",
-                                    "The label the downgrade statement is downgrading from");
+            downgradeFrom = lc.typeSystem().freshLabelVariable(ds.position(),
+                    "downgrade_from",
+                    "The label the downgrade statement is downgrading from");
         }
 
         PathMap initMap = initPathMap(lc);
@@ -95,12 +93,13 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
 
     protected void checkPCconstraint(LabelChecker lc, JifContext A, Label pc,
             Label downgradeFrom, boolean boundSpecified)
-            throws SemanticException {
+                    throws SemanticException {
         final DowngradeStmt ds = (DowngradeStmt) this.node();
         lc.constrain(new NamedLabel("pc", pc),
                 boundSpecified ? LabelConstraint.LEQ : LabelConstraint.EQUAL,
                 new NamedLabel("downgrade_bound", downgradeFrom), A.labelEnv(),
-                ds.position(), boundSpecified, /* report this constraint if the bound was specified*/
+                ds.position(),
+                boundSpecified, /* report this constraint if the bound was specified*/
                 new ConstraintMessage() {
                     @Override
                     public String msg() {
@@ -133,8 +132,8 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
                 });
     }
 
-    protected Stmt checkBody(LabelChecker lc, JifContext A,
-            Label downgradeFrom, Label downgradeTo) throws SemanticException {
+    protected Stmt checkBody(LabelChecker lc, JifContext A, Label downgradeFrom,
+            Label downgradeTo) throws SemanticException {
         JifContext bA = bodyContext(lc, A, downgradeFrom, downgradeTo);
         DowngradeStmt ds = (DowngradeStmt) this.node();
         return (Stmt) lc.context(bA).labelCheck(ds.body());
@@ -180,7 +179,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
      */
     protected abstract void checkOneDimenOnly(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Check the authority condition
@@ -191,7 +190,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
      */
     protected abstract void checkAuthority(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Check the robustness condition
@@ -202,7 +201,7 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
      */
     protected abstract void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException;
+                    throws SemanticException;
 
     /**
      * Check any additional constraints
@@ -213,6 +212,6 @@ public abstract class JifDowngradeStmtExt extends JifStmtExt_c {
      */
     protected void checkAdditionalConstraints(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
     }
 }

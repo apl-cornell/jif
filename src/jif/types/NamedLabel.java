@@ -53,7 +53,8 @@ public class NamedLabel {
 
     }
 
-    public NamedLabel join(LabelChecker lc, String name, String descrip, Label l) {
+    public NamedLabel join(LabelChecker lc, String name, String descrip,
+            Label l) {
         nameToLabels.put(name, l);
         if (descrip != null) {
             nameToDescrip.put(name, descrip);
@@ -75,7 +76,8 @@ public class NamedLabel {
 
     }
 
-    public NamedLabel meet(LabelChecker lc, String name, String descrip, Label l) {
+    public NamedLabel meet(LabelChecker lc, String name, String descrip,
+            Label l) {
         nameToLabels.put(name, l);
         if (descrip != null) {
             nameToDescrip.put(name, descrip);

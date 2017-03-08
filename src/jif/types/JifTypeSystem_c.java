@@ -257,8 +257,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             try {
                 PRINCIPAL_CLASS_ = typeForName(PrincipalClassName());
             } catch (SemanticException e) {
-                throw new InternalCompilerError("Cannot find Jif class "
-                        + PrincipalClassName(), e);
+                throw new InternalCompilerError(
+                        "Cannot find Jif class " + PrincipalClassName(), e);
             }
         }
         return PRINCIPAL_CLASS_;
@@ -310,9 +310,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             boolean castableToNonConst, boolean recurseIntoBaseType) {
         if (recurseIntoBaseType && type.isArray()) {
             ArrayType baseArray = type.toArray();
-            type =
-                    constArrayOf(pos, baseArray.base(), 1, castableToNonConst,
-                            recurseIntoBaseType);
+            type = constArrayOf(pos, baseArray.base(), 1, castableToNonConst,
+                    recurseIntoBaseType);
         }
         if (dims > 1) {
             return constArrayOf(pos,
@@ -328,9 +327,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     protected ArrayType arrayType(Position pos, Type type) {
         if (!isLabeled(type)) {
-            type =
-                    labeledType(pos, type, defaultSignature()
-                            .defaultArrayBaseLabel(type));
+            type = labeledType(pos, type,
+                    defaultSignature().defaultArrayBaseLabel(type));
         }
         return new ConstArrayType_c(this, pos, type, false);
     }
@@ -375,11 +373,10 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             boolean isDefaultReturnLabel, List<? extends Type> formalTypes,
             List<Label> formalArgLabels, List<? extends Type> excTypes,
             List<Assertion> constraints) {
-        JifConstructorInstance ci =
-                new JifConstructorInstance_c(this, pos, container, flags,
-                        startLabel, isDefaultStartLabel, returnLabel,
-                        isDefaultReturnLabel, formalTypes, formalArgLabels,
-                        excTypes, constraints);
+        JifConstructorInstance ci = new JifConstructorInstance_c(this, pos,
+                container, flags, startLabel, isDefaultStartLabel, returnLabel,
+                isDefaultReturnLabel, formalTypes, formalArgLabels, excTypes,
+                constraints);
         return ci;
     }
 
@@ -402,11 +399,10 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             Label endLabel, boolean isDefaultEndLabel,
             List<? extends Type> excTypes, List<Assertion> constraints) {
 
-        JifMethodInstance mi =
-                new JifMethodInstance_c(this, pos, container, flags,
-                        returnType, name, startLabel, isDefaultStartLabel,
-                        formalTypes, formalArgLabels, endLabel,
-                        isDefaultEndLabel, excTypes, constraints);
+        JifMethodInstance mi = new JifMethodInstance_c(this, pos, container,
+                flags, returnType, name, startLabel, isDefaultStartLabel,
+                formalTypes, formalArgLabels, endLabel, isDefaultEndLabel,
+                excTypes, constraints);
         return mi;
     }
 
@@ -545,7 +541,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
             }
             if (p1 instanceof Label && p2 instanceof Label) {
-                if (!(leq((Label) p1, (Label) p2) && leq((Label) p2, (Label) p1))) {
+                if (!(leq((Label) p1, (Label) p2)
+                        && leq((Label) p2, (Label) p1))) {
                     // the labels are not equivalent
                     return null;
                 }
@@ -757,21 +754,20 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             }
 
             if (i.hasNext() || j.hasNext()) {
-                throw new InternalCompilerError("Params and actuals had "
-                        + "different lengths");
+                throw new InternalCompilerError(
+                        "Params and actuals had " + "different lengths");
             }
 
             return (ClassType) subst(pt, subst);
         }
 
-        throw new InternalCompilerError("Cannot null instantiate \"" + pc
-                + "\".");
+        throw new InternalCompilerError(
+                "Cannot null instantiate \"" + pc + "\".");
     }
 
     @Override
-    public void checkInstantiation(Position pos,
-            PClass<ParamInstance, Param> t, List<? extends Param> args)
-            throws SemanticException {
+    public void checkInstantiation(Position pos, PClass<ParamInstance, Param> t,
+            List<? extends Param> args) throws SemanticException {
         super.checkInstantiation(pos, t, args);
 
         // Check that labels are instantiated with labels and principals
@@ -787,8 +783,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                 throw new SemanticException("Cannot use " + p + " as a label.",
                         p.position());
             } else if (pi.isPrincipal() && !(p instanceof Principal)) {
-                throw new SemanticException("Cannot use " + p
-                        + " as a principal.", p.position());
+                throw new SemanticException(
+                        "Cannot use " + p + " as a principal.", p.position());
             }
         }
     }
@@ -840,9 +836,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public DynamicPrincipal dynamicPrincipal(Position pos, AccessPath path) {
-        DynamicPrincipal t =
-                new DynamicPrincipal_c(path, this, pos,
-                        dynamicPrincipalTranslator());
+        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos,
+                dynamicPrincipalTranslator());
         return t;
     }
 
@@ -856,13 +851,13 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             AccessPathConstant apc = (AccessPathConstant) path;
             if (!apc.isPrincipalConstant()) {
                 throw new InternalCompilerError(
-                        "Dynamic principal with a constant access path: " + apc);
+                        "Dynamic principal with a constant access path: "
+                                + apc);
             }
             return (Principal) apc.constantValue();
         }
-        DynamicPrincipal t =
-                new DynamicPrincipal_c(path, this, pos,
-                        dynamicPrincipalTranslator());
+        DynamicPrincipal t = new DynamicPrincipal_c(path, this, pos,
+                dynamicPrincipalTranslator());
         return t;
     }
 
@@ -889,13 +884,15 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public Principal conjunctivePrincipal(Position pos, Principal l, Principal r) {
+    public Principal conjunctivePrincipal(Position pos, Principal l,
+            Principal r) {
         return conjunctivePrincipal(pos,
                 Arrays.asList(new Principal[] { l, r }));
     }
 
     @Override
-    public Principal conjunctivePrincipal(Position pos, Collection<Principal> ps) {
+    public Principal conjunctivePrincipal(Position pos,
+            Collection<Principal> ps) {
         if (ps.isEmpty()) return bottomPrincipal(pos);
         ps = flattenConjuncts(ps);
         if (ps.size() == 1) return ps.iterator().next();
@@ -909,13 +906,15 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public Principal disjunctivePrincipal(Position pos, Principal l, Principal r) {
+    public Principal disjunctivePrincipal(Position pos, Principal l,
+            Principal r) {
         return disjunctivePrincipal(pos,
                 Arrays.asList(new Principal[] { l, r }));
     }
 
     @Override
-    public Principal disjunctivePrincipal(Position pos, Collection<Principal> ps) {
+    public Principal disjunctivePrincipal(Position pos,
+            Collection<Principal> ps) {
         if (ps.isEmpty()) return topPrincipal(pos);
         ps = flattenDisjuncts(ps);
         if (ps.size() == 1) return ps.iterator().next();
@@ -1241,7 +1240,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public LabelLeAssertion labelLeAssertion(Position pos, Label lhs, Label rhs) {
+    public LabelLeAssertion labelLeAssertion(Position pos, Label lhs,
+            Label rhs) {
         return new LabelLeAssertion_c(this, lhs, rhs, pos,
                 labelLeAssertionTranslator());
     }
@@ -1394,18 +1394,18 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     /**
      * Check if the class has an untrusted non-jif ancestor.
-     * 
+     *
      * An untrusted non-jif ancestor is any non-jif ancestor whose constructors
      * may potentially access a final field (which may be on a subclass) before
      * that field has been intitialized.
-     * 
+     *
      * A special marker field is used in Jif signature files for Java classes to
      * declare that all constructors of the Java file are okay.
-     * 
+     *
      * @param t Type to check
      * @return null if ct has no untrusted non-Jif ancestor, and the ClassType
      *         of an untrusted non-Jif ancestor otherwise.
-     * 
+     *
      */
     @Override
     public ClassType hasUntrustedAncestor(Type t) {
@@ -1529,7 +1529,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public IntegPolicy joinIntegPolicy(Position pos, Set<IntegPolicy> components) {
+    public IntegPolicy joinIntegPolicy(Position pos,
+            Set<IntegPolicy> components) {
         if (components.isEmpty()) {
             return bottomIntegPolicy(pos);
         } else if (components.size() == 1) {
@@ -1551,7 +1552,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public IntegPolicy meetIntegPolicy(Position pos, Set<IntegPolicy> components) {
+    public IntegPolicy meetIntegPolicy(Position pos,
+            Set<IntegPolicy> components) {
         if (components.isEmpty()) {
             return topIntegPolicy(pos);
         } else if (components.size() == 1) {
@@ -1632,7 +1634,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public ConfPolicy confProjection(Label L) {
         if (L instanceof MeetLabel || L instanceof JoinLabel
-                || L instanceof PairLabel) return L.confProjection();
+                || L instanceof PairLabel)
+            return L.confProjection();
 
         return new ConfProjectionPolicy_c(L, this, L.position());
     }
@@ -1640,7 +1643,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     @Override
     public IntegPolicy integProjection(Label L) {
         if (L instanceof MeetLabel || L instanceof JoinLabel
-                || L instanceof PairLabel) return L.integProjection();
+                || L instanceof PairLabel)
+            return L.integProjection();
 
         return new IntegProjectionPolicy_c(L, this, L.position());
     }
@@ -1681,7 +1685,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public PrimitiveType primitiveForName(String name) throws SemanticException {
+    public PrimitiveType primitiveForName(String name)
+            throws SemanticException {
 
         if (name.equals("label")) return Label();
         if (name.equals("principal")) return Principal();
@@ -1704,8 +1709,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         assert_(container);
         return jifConstructorInstance(pos, container, Public(), topLabel(),
                 true, bottomLabel(), true, Collections.<Type> emptyList(),
-                Collections.<Label> emptyList(),
-                Collections.<Type> emptyList(),
+                Collections.<Label> emptyList(), Collections.<Type> emptyList(),
                 Collections.<Assertion> emptyList());
     }
 
@@ -1763,9 +1767,9 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
                         f.position());
             } else if (target instanceof TypeNode
                     && ((TypeNode) target).type().isClass()) {
-                AccessPath prefix =
-                        new AccessPathClass(((TypeNode) target).type()
-                                .toClass(), target.position());
+                AccessPath prefix = new AccessPathClass(
+                        ((TypeNode) target).type().toClass(),
+                        target.position());
                 return new AccessPathField(prefix, f.fieldInstance(), f.name(),
                         f.position());
             } else {
@@ -1776,7 +1780,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         } else if (e instanceof Special) {
             Special s = (Special) e;
             if (Special.THIS.equals(s.kind())) {
-                if (context.currentClass() == null || context.inStaticContext()) {
+                if (context.currentClass() == null
+                        || context.inStaticContext()) {
                     throw new SemanticException(
                             "Cannot use \"this\" in this scope.", e.position());
                 }
@@ -1816,9 +1821,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         }
         throw new SemanticDetailedException(
                 "Expression " + e + " not suitable for an access path.",
-                "The expression "
-                        + e
-                        + " is not suitable for a final access "
+                "The expression " + e + " is not suitable for a final access "
                         + "path. A final access path is an expression starting with either "
                         + "\"this\" or a final local variable \"v\", followed by zero or more final field accesses. That is, "
                         + "a final access path is either this.f1.f2....fn, or v.f1.f2.....fn, where v is a "
@@ -1893,8 +1896,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             if (f.type() != null && f.type().isCanonical()) {
                 Flags flgs = f.flags();
                 return flgs.isFinal()
-                        && (flgs.isStatic() || (f.target() instanceof Expr && isFinalAccessExpr((Expr) f
-                                .target())));
+                        && (flgs.isStatic() || (f.target() instanceof Expr
+                                && isFinalAccessExpr((Expr) f.target())));
             } else {
                 return true;
             }
@@ -1913,16 +1916,15 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public boolean isFinalAccessExprOrConst(Expr e, Type expectedType) {
-        return isFinalAccessExpr(e)
-                || e instanceof LabelExpr
-                || e instanceof PrincipalNode
-                || (e instanceof Cast && isFinalAccessExprOrConst(((Cast) e)
-                        .expr()))
-                || (e instanceof DowngradeExpr && isFinalAccessExprOrConst(((DowngradeExpr) e)
-                        .expr()))
-                || (e instanceof NullLit && expectedType != null && isImplicitCastValid(
-                        expectedType, Principal()))
-        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;
+        return isFinalAccessExpr(e) || e instanceof LabelExpr
+                || e instanceof PrincipalNode || e instanceof PrincipalExpr
+                || (e instanceof Cast
+                        && isFinalAccessExprOrConst(((Cast) e).expr()))
+                || (e instanceof DowngradeExpr
+                        && isFinalAccessExprOrConst(((DowngradeExpr) e).expr()))
+                || (e instanceof NullLit && expectedType != null
+                        && isImplicitCastValid(expectedType, Principal()))
+                        /*|| (e instanceof Special && ((Special)e).kind() == Special.SUPER)*/;
     }
 
     @Override
@@ -1971,9 +1973,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
         for (FieldInstance fieldInstance : ct.fields()) {
             JifFieldInstance jfi = (JifFieldInstance) fieldInstance;
             if (jfi.flags().isFinal()) {
-                AccessPathField path2 =
-                        new AccessPathField(path, jfi, jfi.name(),
-                                jfi.position());
+                AccessPathField path2 = new AccessPathField(path, jfi,
+                        jfi.name(), jfi.position());
                 // if it is static and is the end of a final access path and has an initializer
                 // TODO Could use isFinalAccessExprOrConst instead of restricting to isStatic and hasInitializer
                 Param init2 = jfi.initializer();
@@ -2022,7 +2023,7 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     /*
-     *  
+     *
      *  */
     @Override
     public AccessPath varInstanceToAccessPath(VarInstance vi, String name,
@@ -2044,8 +2045,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
             }
             return new AccessPathField(root, fi, name, pos);
         }
-        throw new InternalCompilerError("Unexpected var instance "
-                + vi.getClass());
+        throw new InternalCompilerError(
+                "Unexpected var instance " + vi.getClass());
     }
 
     @Override
@@ -2056,11 +2057,10 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
 
     @Override
     public boolean needsDynamicTypeMethods(Type ct) {
-        boolean hasParams =
-                (ct instanceof JifSubstType && !((JifSubstType) ct).actuals()
-                        .isEmpty())
-                        || (ct instanceof JifPolyType && !((JifPolyType) ct)
-                                .params().isEmpty());
+        boolean hasParams = (ct instanceof JifSubstType
+                && !((JifSubstType) ct).actuals().isEmpty())
+                || (ct instanceof JifPolyType
+                        && !((JifPolyType) ct).params().isEmpty());
         return isParamsRuntimeRep(ct) && hasParams;
     }
 

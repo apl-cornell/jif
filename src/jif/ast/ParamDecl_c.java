@@ -29,7 +29,8 @@ public class ParamDecl_c extends Node_c implements ParamDecl {
         this(pos, kind, name, null);
     }
 
-    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name, Ext ext) {
+    public ParamDecl_c(Position pos, ParamInstance.Kind kind, Id name,
+            Ext ext) {
         super(pos, ext);
         this.kind = kind;
         this.name = name;

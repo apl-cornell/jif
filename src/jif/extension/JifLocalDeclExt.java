@@ -59,15 +59,13 @@ public class JifLocalDeclExt extends JifStmtExt_c {
         // and "final principal p = ..."
         if (li.flags().isFinal() && ts.isFinalAccessExprOrConst(decl.init())) {
             if (ts.isLabel(li.type())) {
-                Label dl =
-                        ts.dynamicLabel(decl.position(),
-                                ts.varInstanceToAccessPath(li, li.position()));
+                Label dl = ts.dynamicLabel(decl.position(),
+                        ts.varInstanceToAccessPath(li, li.position()));
                 Label rhs_label = ts.exprToLabel(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalAssertionEquiv(dl, rhs_label);
             } else if (ts.isImplicitCastValid(li.type(), ts.Principal())) {
-                DynamicPrincipal dp =
-                        ts.dynamicPrincipal(decl.position(),
-                                ts.varInstanceToAccessPath(li, li.position()));
+                DynamicPrincipal dp = ts.dynamicPrincipal(decl.position(),
+                        ts.varInstanceToAccessPath(li, li.position()));
                 Principal rhs_principal =
                         ts.exprToPrincipal(ts, decl.init(), lc.context());
                 lc.context().addDefinitionalEquiv(dp, rhs_principal);
@@ -82,9 +80,8 @@ public class JifLocalDeclExt extends JifStmtExt_c {
 
         // add other special cases: "final C c = ..."
         if (li.flags().isFinal()) {
-            AccessPathLocal path =
-                    (AccessPathLocal) ts.varInstanceToAccessPath(li,
-                            li.position());
+            AccessPathLocal path = (AccessPathLocal) ts
+                    .varInstanceToAccessPath(li, li.position());
             ts.processFAP(li, path, lc.context());
         }
 
@@ -125,12 +122,15 @@ public class JifLocalDeclExt extends JifStmtExt_c {
                         new NamedLabel("local_label",
                                 "inferred label of local var " + li.name(), L),
                         LabelConstraint.EQUAL,
-                        new NamedLabel(
-                                "PC",
+                        new NamedLabel("PC",
                                 "Information revealed by program counter being at this program point",
-                                A.pc()).join(lc, "declared label of local var "
-                                + li.name(), declaredLabel), A.labelEnv(), decl
-                                .position(), false, new ConstraintMessage() {
+                                A.pc()).join(
+                                        lc,
+                                        "declared label of local var "
+                                                + li.name(),
+                                        declaredLabel),
+                        A.labelEnv(), decl.position(), false,
+                        new ConstraintMessage() {
                             @Override
                             public String msg() {
                                 return "Declared label of local variable "
@@ -157,8 +157,8 @@ public class JifLocalDeclExt extends JifStmtExt_c {
             t = li.type();
 
             if (init instanceof ArrayInit) {
-                ((JifArrayInitExt) (JifUtil.jifExt(init))).labelCheckElements(
-                        lc, decl.type().type());
+                ((JifArrayInitExt) (JifUtil.jifExt(init)))
+                        .labelCheckElements(lc, decl.type().type());
             } else {
                 // Must check that the expression type is a subtype of the
                 // declared type.  Most of this is done in typeCheck, but if
@@ -175,13 +175,12 @@ public class JifLocalDeclExt extends JifStmtExt_c {
 
             final JifLocalInstance fli = li;
             lc.constrain(
-                    new NamedLabel(
-                            "init.nv",
+                    new NamedLabel("init.nv",
                             "label of successful evaluation of initializing expression",
-                            Xe.NV()), LabelConstraint.LEQ, new NamedLabel(
-                            "label of local variable " + li.name(), L), A
-                            .labelEnv(), init.position(),
-                    new ConstraintMessage() {
+                            Xe.NV()),
+                    LabelConstraint.LEQ,
+                    new NamedLabel("label of local variable " + li.name(), L),
+                    A.labelEnv(), init.position(), new ConstraintMessage() {
                         @Override
                         public String msg() {
                             return "Label of local variable initializer not less "

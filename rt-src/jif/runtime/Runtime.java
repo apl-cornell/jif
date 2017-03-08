@@ -40,8 +40,8 @@ public class Runtime {
         //check if the current user can act for p
         Principal user = user(p);
         if (!PrincipalUtil.actsFor(user, p)) {
-            throw new SecurityException("The current user does not act for "
-                    + p.name() + ".");
+            throw new SecurityException(
+                    "The current user does not act for " + p.name() + ".");
         }
         return new Runtime(p);
     }
@@ -58,16 +58,14 @@ public class Runtime {
     }
 
     private Label defaultOutputLabel() {
-        ConfPolicy cp =
-                LabelUtil.singleton().readerPolicy(dynp,
-                        new LinkedList<Principal>());
+        ConfPolicy cp = LabelUtil.singleton().readerPolicy(dynp,
+                new LinkedList<Principal>());
         return LabelUtil.singleton().toLabel(cp);
     }
 
     private Label defaultInputLabel() {
-        IntegPolicy ip =
-                LabelUtil.singleton().writerPolicy(dynp,
-                        new LinkedList<Principal>());
+        IntegPolicy ip = LabelUtil.singleton().writerPolicy(dynp,
+                new LinkedList<Principal>());
         return LabelUtil.singleton().toLabel(ip);
     }
 
@@ -140,8 +138,8 @@ public class Runtime {
         if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel()))
             return System.err;
 
-        throw new SecurityException("The standard error output is not "
-                + "sufficiently secure.");
+        throw new SecurityException(
+                "The standard error output is not " + "sufficiently secure.");
     }
 
     /**
@@ -151,8 +149,8 @@ public class Runtime {
     public PrintStream stdout(Label l) {
         if (LabelUtil.singleton().relabelsTo(l, defaultOutputLabel()))
             return System.out;
-        throw new SecurityException("The standard output is not "
-                + "sufficiently secure.");
+        throw new SecurityException(
+                "The standard output is not " + "sufficiently secure.");
     }
 
     /**
@@ -163,8 +161,8 @@ public class Runtime {
         if (LabelUtil.singleton().relabelsTo(defaultInputLabel(), l))
             return System.in;
 
-        throw new SecurityException("The standard output is not "
-                + "sufficiently secure.");
+        throw new SecurityException(
+                "The standard output is not " + "sufficiently secure.");
     }
 
     /**
@@ -242,9 +240,8 @@ public class Runtime {
                 if (o.getClass().getComponentType().isPrimitive()) {
                     // o is of type e.g., int[]. Need to clone it.
                     int length = Array.getLength(o);
-                    o =
-                            Array.newInstance(o.getClass().getComponentType(),
-                                    length);
+                    o = Array.newInstance(o.getClass().getComponentType(),
+                            length);
                     System.arraycopy(a[i], 0, o, 0, length);
                 } else {
                     // o i of type C[]

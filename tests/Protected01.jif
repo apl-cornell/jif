@@ -1,0 +1,5 @@
+class Protected01[label L] extends A.Protected01A[L] {
+  public Object{} m() {
+    return o;
+  }
+}

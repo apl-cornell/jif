@@ -23,6 +23,7 @@ import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl_c;
 import polyglot.ast.Ext;
 import polyglot.ast.Id;
+import polyglot.ast.Javadoc;
 import polyglot.ast.Node;
 import polyglot.ast.TypeNode;
 import polyglot.ext.param.types.MuPClass;
@@ -59,16 +60,18 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints, ClassBody body) {
+            List<ConstraintNode<Assertion>> constraints, ClassBody body,
+            Javadoc javadoc) {
         this(pos, flags, name, params, superClass, interfaces, authority,
-                constraints, body, null);
+                constraints, body, javadoc, null);
     }
 
     public JifClassDecl_c(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints, ClassBody body, Ext ext) {
-        super(pos, flags, name, superClass, interfaces, body, ext);
+            List<ConstraintNode<Assertion>> constraints, ClassBody body,
+            Javadoc javadoc, Ext ext) {
+        super(pos, flags, name, superClass, interfaces, body, javadoc, ext);
         this.params = ListUtil.copy(params, true);
         this.authority = ListUtil.copy(authority, true);
         this.constraints = ListUtil.copy(constraints, true);
@@ -80,7 +83,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
     }
 
     @Override
-    public JifClassDecl constraints(List<ConstraintNode<Assertion>> constraints) {
+    public JifClassDecl constraints(
+            List<ConstraintNode<Assertion>> constraints) {
         return constraints(this, constraints);
     }
 
@@ -183,7 +187,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
                         (ActsForConstraint<ActsForParam, ActsForParam>) constraint;
                 ActsForParam actor = pi.actor();
                 ActsForParam granter = pi.granter();
-                if (actor instanceof Principal && granter instanceof Principal) {
+                if (actor instanceof Principal
+                        && granter instanceof Principal) {
                     A.addActsFor((Principal) actor, (Principal) granter);
                 } else if (actor instanceof Label) {
                     A.addActsFor((Label) actor, (Principal) granter);
@@ -196,8 +201,9 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
                 LabelLeAssertion lle = (LabelLeAssertion) constraint;
                 A.addAssertionLE(lle.lhs(), lle.rhs());
             } else {
-                throw new InternalCompilerError("Unexpected assertion type: "
-                        + constraint, constraint.position());
+                throw new InternalCompilerError(
+                        "Unexpected assertion type: " + constraint,
+                        constraint.position());
             }
         }
 
@@ -327,7 +333,8 @@ public class JifClassDecl_c extends ClassDecl_c implements JifClassDecl {
 
         if (!authority.isEmpty()) {
             w.write(" authority(");
-            for (Iterator<PrincipalNode> i = authority.iterator(); i.hasNext();) {
+            for (Iterator<PrincipalNode> i = authority.iterator(); i
+                    .hasNext();) {
                 PrincipalNode p = i.next();
                 print(p, w, tr);
                 if (i.hasNext()) {

@@ -83,8 +83,8 @@ public class JifCallExt extends JifExprExt implements CallOps {
 
         if (A.checkingInits()) {
             // in the constructor prologue, the this object cannot be the receiver or an argument
-            if (me.target() instanceof Expr
-                    && JifUtil.effectiveExpr((Expr) me.target()) instanceof Special) {
+            if (me.target() instanceof Expr && JifUtil
+                    .effectiveExpr((Expr) me.target()) instanceof Special) {
                 throw new SemanticDetailedException(
                         "No methods may be called on \"this\" object in a constructor prologue.",
                         "In a constructor body before the call to the super class, no "
@@ -121,24 +121,20 @@ public class JifCallExt extends JifExprExt implements CallOps {
                 JifFieldInstance jfi = (JifFieldInstance) fi;
                 if (jfi.flags().isFinal() && jfi.flags().isStatic()
                         && jfi.hasInitializer()) {
-                    AccessPathField path =
-                            (AccessPathField) ts.varInstanceToAccessPath(jfi,
-                                    jfi.position());
+                    AccessPathField path = (AccessPathField) ts
+                            .varInstanceToAccessPath(jfi, jfi.position());
                     Param init = jfi.initializer();
                     if (ts.isLabel(jfi.type())) {
                         Label dl = ts.dynamicLabel(jfi.position(), path);
                         Label rhs_label = (Label) init;
                         if (rhs_label == null) {
                             // label checking has not been done on ct yet
-                            JifScheduler sched =
-                                    (JifScheduler) lc.job().extensionInfo()
-                                            .scheduler();
+                            JifScheduler sched = (JifScheduler) lc.job()
+                                    .extensionInfo().scheduler();
                             ParsedClassType pct = (ParsedClassType) rt;
                             if (sched.sourceHasJob(pct.fromSource())) {
-                                Job job =
-                                        sched.loadSource(
-                                                (FileSource) pct.fromSource(),
-                                                true);
+                                Job job = sched.loadSource(
+                                        (FileSource) pct.fromSource(), true);
                                 if (job != null) {
                                     Goal g = sched.LabelsDoubleChecked(job);
                                     throw new MissingDependencyException(g);
@@ -156,25 +152,21 @@ public class JifCallExt extends JifExprExt implements CallOps {
                         Principal rhs_principal = (Principal) init;
                         if (rhs_principal == null) {
                             // label checking has not been done on ct yet
-                            JifScheduler sched =
-                                    (JifScheduler) lc.job().extensionInfo()
-                                            .scheduler();
+                            JifScheduler sched = (JifScheduler) lc.job()
+                                    .extensionInfo().scheduler();
                             ParsedClassType pct = (ParsedClassType) rt;
 
                             if (sched.sourceHasJob(pct.fromSource())) {
-                                Job job =
-                                        sched.loadSource(
-                                                (FileSource) pct.fromSource(),
-                                                true);
+                                Job job = sched.loadSource(
+                                        (FileSource) pct.fromSource(), true);
                                 if (job != null) {
                                     Goal g = sched.LabelsDoubleChecked(job);
                                     throw new MissingDependencyException(g);
                                 }
                             }
                             // turns out label checking has occurred, but the init was null.
-                            rhs_principal =
-                                    ts.bottomPrincipal(Position
-                                            .compilerGenerated());
+                            rhs_principal = ts.bottomPrincipal(
+                                    Position.compilerGenerated());
                         }
                         A.addDefinitionalEquiv(dp, rhs_principal);
                     }
@@ -185,9 +177,8 @@ public class JifCallExt extends JifExprExt implements CallOps {
         // Find the method instance again. This ensures that
         // we have the correctly instantiated type, as label checking
         // of the target may have produced a new type for the target.
-        JifMethodInstance mi =
-                (JifMethodInstance) ts.findMethod(rt, me.name(), me
-                        .methodInstance().formalTypes(), A.currentClass());
+        JifMethodInstance mi = (JifMethodInstance) ts.findMethod(rt, me.name(),
+                me.methodInstance().formalTypes(), A.currentClass());
 
         me = me.methodInstance(mi);
 
@@ -217,15 +208,13 @@ public class JifCallExt extends JifExprExt implements CallOps {
                 objLabel = Xs.NV();
                 A.setPc(Xs.NV(), lc);
             } else {
-                objLabel =
-                        ((JifClassType) lc.context().currentClass())
-                                .thisLabel();
+                objLabel = ((JifClassType) lc.context().currentClass())
+                        .thisLabel();
             }
         }
 
-        CallHelper helper =
-                lc.createCallHelper(objLabel, target, mi.container(), mi,
-                        me.arguments(), node().position());
+        CallHelper helper = lc.createCallHelper(objLabel, target,
+                mi.container(), mi, me.arguments(), node().position());
         LabelChecker callLC = lc.context(A);
         helper.checkCall(callLC, throwTypes, npExc);
 

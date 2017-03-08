@@ -22,7 +22,7 @@ public class JifEndorseStmtExt extends JifDowngradeStmtExt {
     @Override
     protected void checkOneDimenOnly(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifEndorseExprExt.checkOneDimen(lc, A, labelFrom, labelTo, pos, false,
                 false);
     }
@@ -30,7 +30,7 @@ public class JifEndorseStmtExt extends JifDowngradeStmtExt {
     @Override
     protected void checkAuthority(LabelChecker lc, final JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifEndorseExprExt.checkAuth(lc, A, labelFrom, labelTo, pos, false,
                 false);
     }
@@ -38,7 +38,7 @@ public class JifEndorseStmtExt extends JifDowngradeStmtExt {
     @Override
     protected void checkRobustness(LabelChecker lc, JifContext A,
             Label labelFrom, Label labelTo, Position pos)
-            throws SemanticException {
+                    throws SemanticException {
         JifEndorseExprExt.checkRobustEndorse(lc, A, labelFrom, labelTo, pos,
                 false);
     }

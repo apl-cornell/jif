@@ -14,7 +14,8 @@ public final class Capability {
         return closure.invoke();
     }
 
-    Capability(final Principal jif$P, final Label jif$L, final Closure closure) {
+    Capability(final Principal jif$P, final Label jif$L,
+            final Closure closure) {
         this.jif$jif_lang_Capability_P = jif$P;
         this.jif$jif_lang_Capability_L = jif$L;
         this.closure = closure;
@@ -25,21 +26,17 @@ public final class Capability {
         if (o instanceof Capability) {
             Capability c = (Capability) o;
             boolean ok = true;
-            ok =
-                    ok
-                            && PrincipalUtil.equivalentTo(
-                                    c.jif$jif_lang_Capability_P, jif$P);
-            ok =
-                    ok
-                            && LabelUtil.singleton().equivalentTo(
-                                    c.jif$jif_lang_Capability_L, jif$L);
+            ok = ok && PrincipalUtil.equivalentTo(c.jif$jif_lang_Capability_P,
+                    jif$P);
+            ok = ok && LabelUtil.singleton()
+                    .equivalentTo(c.jif$jif_lang_Capability_L, jif$L);
             return ok;
         }
         return false;
     }
 
-    public static Capability jif$cast$jif_lang_Capability(
-            final Principal jif$P, final Label jif$L, final Object o) {
+    public static Capability jif$cast$jif_lang_Capability(final Principal jif$P,
+            final Label jif$L, final Object o) {
         if (o == null) return null;
         if (jif$Instanceof(jif$P, jif$L, o)) return (Capability) o;
         throw new ClassCastException();

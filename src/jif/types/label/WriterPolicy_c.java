@@ -117,7 +117,7 @@ public class WriterPolicy_c extends Policy_c implements WriterPolicy {
     @Override
     public String toString(Set<Label> printedLabels) {
         StringBuffer sb = new StringBuffer(owner.toString());
-        sb.append("<-");
+        sb.append("←");
         if (!writer.isTopPrincipal()) sb.append(writer.toString());
         return sb.toString();
     }

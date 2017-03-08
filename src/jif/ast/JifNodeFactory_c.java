@@ -25,6 +25,7 @@ import polyglot.ast.Expr;
 import polyglot.ast.Formal;
 import polyglot.ast.Id;
 import polyglot.ast.If;
+import polyglot.ast.Javadoc;
 import polyglot.ast.LocalDecl;
 import polyglot.ast.MethodDecl;
 import polyglot.ast.New;
@@ -88,8 +89,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     }
 
     @Override
-    public AmbNewArray AmbNewArray(Position pos, TypeNode baseType,
-            Object expr, List<Expr> dims, int addDims) {
+    public AmbNewArray AmbNewArray(Position pos, TypeNode baseType, Object expr,
+            List<Expr> dims, int addDims) {
         AmbNewArray n = new AmbNewArray_c(pos, baseType, expr, dims, addDims);
         n = ext(n, jifExtFactory().extAmbNewArray());
         n = del(n, delFactory().delAmbExpr());
@@ -246,13 +247,13 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     @Override
     public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
-            TypeNode superClass, List<TypeNode> interfaces, ClassBody body) {
-        ClassDecl n =
-                new JifClassDecl_c(pos, flags, name,
-                        Collections.<ParamDecl> emptyList(), superClass,
-                        interfaces, Collections.<PrincipalNode> emptyList(),
-                        Collections.<ConstraintNode<Assertion>> emptyList(),
-                        body);
+            TypeNode superClass, List<TypeNode> interfaces, ClassBody body,
+            Javadoc javadoc) {
+        ClassDecl n = new JifClassDecl_c(pos, flags, name,
+                Collections.<ParamDecl> emptyList(), superClass, interfaces,
+                Collections.<PrincipalNode> emptyList(),
+                Collections.<ConstraintNode<Assertion>> emptyList(), body,
+                javadoc);
         n = ext(n, extFactory().extClassDecl());
         n = del(n, delFactory().delClassDecl());
         return n;
@@ -271,24 +272,23 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public JifClassDecl JifClassDecl(Position pos, Flags flags, Id name,
             List<ParamDecl> params, TypeNode superClass,
             List<TypeNode> interfaces, List<PrincipalNode> authority,
-            List<ConstraintNode<Assertion>> constraints, ClassBody body) {
-        JifClassDecl n =
-                new JifClassDecl_c(pos, flags, name, params, superClass,
-                        interfaces, authority, constraints, body);
+            List<ConstraintNode<Assertion>> constraints, ClassBody body,
+            Javadoc javadoc) {
+        JifClassDecl n = new JifClassDecl_c(pos, flags, name, params,
+                superClass, interfaces, authority, constraints, body, javadoc);
         n = ext(n, extFactory().extClassDecl());
         n = del(n, delFactory().delClassDecl());
         return n;
     }
 
     @Override
-    public MethodDecl MethodDecl(Position pos, Flags flags,
-            TypeNode returnType, Id name, List<Formal> formals,
-            List<TypeNode> throwTypes, Block body) {
-        MethodDecl n =
-                new JifMethodDecl_c(pos, flags, returnType, name, null,
-                        formals, null, throwTypes,
-                        Collections.<ConstraintNode<Assertion>> emptyList(),
-                        body);
+    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType,
+            Id name, List<Formal> formals, List<TypeNode> throwTypes,
+            Block body, Javadoc javadoc) {
+        MethodDecl n = new JifMethodDecl_c(pos, flags, returnType, name, null,
+                formals, null, throwTypes,
+                Collections.<ConstraintNode<Assertion>> emptyList(), body,
+                javadoc);
         n = ext(n, extFactory().extMethodDecl());
         n = del(n, delFactory().delMethodDecl());
         return n;
@@ -297,12 +297,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     @Override
     public JifMethodDecl JifMethodDecl(Position pos, Flags flags,
             TypeNode returnType, Id name, LabelNode startLabel,
-            List<Formal> formals, LabelNode endLabel,
-            List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body) {
-        JifMethodDecl n =
-                new JifMethodDecl_c(pos, flags, returnType, name, startLabel,
-                        formals, endLabel, throwTypes, constraints, body);
+            List<Formal> formals, LabelNode endLabel, List<TypeNode> throwTypes,
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc) {
+        JifMethodDecl n = new JifMethodDecl_c(pos, flags, returnType, name,
+                startLabel, formals, endLabel, throwTypes, constraints, body,
+                javadoc);
 
         n = ext(n, extFactory().extMethodDecl());
         n = del(n, delFactory().delMethodDecl());
@@ -311,12 +311,12 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
 
     @Override
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
-            List<Formal> formals, List<TypeNode> throwTypes, Block body) {
-        ConstructorDecl n =
-                new JifConstructorDecl_c(pos, flags, name, null, null, formals,
-                        throwTypes,
-                        Collections.<ConstraintNode<Assertion>> emptyList(),
-                        body);
+            List<Formal> formals, List<TypeNode> throwTypes, Block body,
+            Javadoc javadoc) {
+        ConstructorDecl n = new JifConstructorDecl_c(pos, flags, name, null,
+                null, formals, throwTypes,
+                Collections.<ConstraintNode<Assertion>> emptyList(), body,
+                javadoc);
         n = ext(n, extFactory().extConstructorDecl());
         n = del(n, delFactory().delConstructorDecl());
         return n;
@@ -326,10 +326,11 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
     public JifConstructorDecl JifConstructorDecl(Position pos, Flags flags,
             Id name, LabelNode startLabel, LabelNode returnLabel,
             List<Formal> formals, List<TypeNode> throwTypes,
-            List<ConstraintNode<Assertion>> constraints, Block body) {
-        JifConstructorDecl n =
-                new JifConstructorDecl_c(pos, flags, name, startLabel,
-                        returnLabel, formals, throwTypes, constraints, body);
+            List<ConstraintNode<Assertion>> constraints, Block body,
+            Javadoc javadoc) {
+        JifConstructorDecl n = new JifConstructorDecl_c(pos, flags, name,
+                startLabel, returnLabel, formals, throwTypes, constraints, body,
+                javadoc);
         n = ext(n, extFactory().extConstructorDecl());
         n = del(n, delFactory().delConstructorDecl());
         return n;
@@ -429,9 +430,8 @@ public class JifNodeFactory_c extends NodeFactory_c implements JifNodeFactory {
         PrincipalActsForPrincipalConstraintNode n =
                 new PrincipalActsForPrincipalConstraintNode_c(pos, actor,
                         granter, isEquiv);
-        n =
-                ext(n, jifExtFactory()
-                        .extPrincipalActsForPrincipalConstraintNode());
+        n = ext(n,
+                jifExtFactory().extPrincipalActsForPrincipalConstraintNode());
         n = del(n, delFactory().delNode());
         return n;
     }

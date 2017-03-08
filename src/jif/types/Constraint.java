@@ -16,8 +16,8 @@ import polyglot.util.SerialVersionUID;
 public abstract class Constraint {
     /** Kinds of constraint, either equality or inequality. */
     public static class Kind extends Enum {
-        private static final long serialVersionUID = SerialVersionUID
-                .generate();
+        private static final long serialVersionUID =
+                SerialVersionUID.generate();
 
         protected Kind(String name) {
             super(name);

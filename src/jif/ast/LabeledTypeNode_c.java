@@ -23,8 +23,8 @@ import polyglot.visit.TypeChecker;
 
 /** An implementation of the <code>LabeledTypeNode</code> interface.
  */
-public class LabeledTypeNode_c extends TypeNode_c implements LabeledTypeNode,
-        Ambiguous {
+public class LabeledTypeNode_c extends TypeNode_c
+        implements LabeledTypeNode, Ambiguous {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected TypeNode typePart;

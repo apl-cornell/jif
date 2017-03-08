@@ -22,6 +22,7 @@ public class LabelUtil {
     }
 
     protected static LabelUtil singleton;
+
     static {
         singleton = new LabelUtil();
     }
@@ -152,9 +153,8 @@ public class LabelUtil {
 
     {
         BOTTOM_CONF = this.readerPolicy(null, (Principal) null);
-        TOP_CONF =
-                this.readerPolicy(PrincipalUtil.topPrincipal(),
-                        PrincipalUtil.topPrincipal());
+        TOP_CONF = this.readerPolicy(PrincipalUtil.topPrincipal(),
+                PrincipalUtil.topPrincipal());
         TOP_INTEG = this.writerPolicy(null, (Principal) null);
         NO_COMPONENTS = this.toLabel(BOTTOM_CONF, TOP_INTEG);
     }
@@ -231,9 +231,8 @@ public class LabelUtil {
             Collection<Principal> readers) {
         try {
             enterTiming();
-            Label l =
-                    toLabel(readerPolicy(owner,
-                            PrincipalUtil.disjunction(readers)));
+            Label l = toLabel(
+                    readerPolicy(owner, PrincipalUtil.disjunction(readers)));
             return l;
         } finally {
             exitTiming();
@@ -247,9 +246,8 @@ public class LabelUtil {
             Principal[] readers) {
         try {
             enterTiming();
-            if (readers == null)
-                return readerPolicyLabel(owner,
-                        Collections.<Principal> emptySet());
+            if (readers == null) return readerPolicyLabel(owner,
+                    Collections.<Principal> emptySet());
             return readerPolicyLabel(owner, Arrays.asList(readers));
         } finally {
             exitTiming();
@@ -298,8 +296,8 @@ public class LabelUtil {
             Collection<Principal> writers) {
         try {
             enterTiming();
-            return toLabel(writerPolicy(owner,
-                    PrincipalUtil.disjunction(writers)));
+            return toLabel(
+                    writerPolicy(owner, PrincipalUtil.disjunction(writers)));
         } finally {
             exitTiming();
         }
@@ -312,9 +310,8 @@ public class LabelUtil {
             Principal[] writers) {
         try {
             enterTiming();
-            if (writers == null)
-                return writerPolicyLabel(owner,
-                        Collections.<Principal> emptySet());
+            if (writers == null) return writerPolicyLabel(owner,
+                    Collections.<Principal> emptySet());
             return writerPolicyLabel(owner, Arrays.asList(writers));
         } finally {
             exitTiming();
@@ -403,11 +400,11 @@ public class LabelUtil {
                     PairLabel pl2 = (PairLabel) l2;
                     Set<DelegationPair> dependencies =
                             new HashSet<DelegationPair>();
-                    result =
-                            new PairLabel(this, pl1.confPolicy().join(
-                                    pl2.confPolicy(), dependencies), pl1
-                                    .integPolicy().join(pl2.integPolicy(),
-                                            dependencies));
+                    result = new PairLabel(this,
+                            pl1.confPolicy().join(pl2.confPolicy(),
+                                    dependencies),
+                            pl1.integPolicy().join(pl2.integPolicy(),
+                                    dependencies));
                     if (USE_CACHING) {
                         // add dependencies from delegations to the cache result
                         // i.e., what dependencies does this result rely on?
@@ -454,11 +451,11 @@ public class LabelUtil {
                     PairLabel pl2 = (PairLabel) l2;
                     Set<DelegationPair> dependencies =
                             new HashSet<DelegationPair>();
-                    result =
-                            new PairLabel(this, pl1.confPolicy().meet(
-                                    pl2.confPolicy(), dependencies), pl1
-                                    .integPolicy().meet(pl2.integPolicy(),
-                                            dependencies));
+                    result = new PairLabel(this,
+                            pl1.confPolicy().meet(pl2.confPolicy(),
+                                    dependencies),
+                            pl1.integPolicy().meet(pl2.integPolicy(),
+                                    dependencies));
                     if (USE_CACHING) {
                         // add dependencies from delegations to the cache result
                         // i.e., what dependencies does this result rely on?
@@ -863,8 +860,8 @@ public class LabelUtil {
             if (o instanceof Pair) {
                 Pair that = (Pair) o;
                 return (this.left == that.left || this.left.equals(that.left))
-                        && (this.right == that.right || this.right
-                                .equals(that.right));
+                        && (this.right == that.right
+                                || this.right.equals(that.right));
             }
             return false;
         }

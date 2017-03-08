@@ -23,8 +23,8 @@ import polyglot.visit.NodeVisitor;
 
 /** An implementation of the <code>AmbParamTypeOrAccess</code> interface.
  */
-public class AmbParamTypeOrAccess_c extends Node_c implements
-        AmbParamTypeOrAccess {
+public class AmbParamTypeOrAccess_c extends Node_c
+        implements AmbParamTypeOrAccess {
     private static final long serialVersionUID = SerialVersionUID.generate();
 
     protected Receiver prefix;
@@ -57,7 +57,8 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
         return prefix(this, prefix);
     }
 
-    protected <N extends AmbParamTypeOrAccess_c> N prefix(N n, Receiver prefix) {
+    protected <N extends AmbParamTypeOrAccess_c> N prefix(N n,
+            Receiver prefix) {
         if (n.prefix == prefix) return n;
         n = copyIfNeeded(n);
         n.prefix = prefix;
@@ -108,8 +109,8 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
         JifTypeSystem ts = (JifTypeSystem) ar.typeSystem();
         JifNodeFactory nf = (JifNodeFactory) ar.nodeFactory();
 
-        if (!ar.isASTDisambiguated(prefix)
-                || (expr instanceof Expr && !ar.isASTDisambiguated((Expr) expr))) {
+        if (!ar.isASTDisambiguated(prefix) || (expr instanceof Expr
+                && !ar.isASTDisambiguated((Expr) expr))) {
             ar.job().extensionInfo().scheduler().currentGoal()
                     .setUnreachableThisRun();
             return this;
@@ -120,14 +121,16 @@ public class AmbParamTypeOrAccess_c extends Node_c implements
             TypeNode tn = (TypeNode) prefix;
 
             if (!(tn.type() instanceof JifPolyType)) {
-                throw new SemanticException(tn.type()
-                        + " is not a parameterized type.", position());
+                throw new SemanticException(
+                        tn.type() + " is not a parameterized type.",
+                        position());
             }
             JifPolyType pt = (JifPolyType) tn.type();
 
             if (pt.params().isEmpty()) {
-                throw new SemanticException(tn.type()
-                        + " is not a parameterized type.", position());
+                throw new SemanticException(
+                        tn.type() + " is not a parameterized type.",
+                        position());
             }
 
             ParamNode n;

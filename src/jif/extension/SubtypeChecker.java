@@ -55,13 +55,13 @@ public class SubtypeChecker {
         supertype = ts.unlabel(supertype);
         subtype = ts.unlabel(subtype);
 
-        if (Report.should_report(Report.types, 1))
-            Report.report(1, "Adding subtype constraints: " + supertype
-                    + " >= " + subtype);
+        if (Report.should_report(Report.types, 1)) Report.report(1,
+                "Adding subtype constraints: " + supertype + " >= " + subtype);
 
-        if (!recursiveAddSubtypeConstraints(lc, pos, supertype, subtype, false)) {
-            throw new SemanticException(subtype + " is not a subtype of "
-                    + supertype + ".", pos);
+        if (!recursiveAddSubtypeConstraints(lc, pos, supertype, subtype,
+                false)) {
+            throw new SemanticException(
+                    subtype + " is not a subtype of " + supertype + ".", pos);
         }
     }
 
@@ -70,8 +70,9 @@ public class SubtypeChecker {
             return (Label) param;
         }
         if (param == null) {
-            throw new SemanticException("No parameter given; expected a "
-                    + "label parameter.", pos);
+            throw new SemanticException(
+                    "No parameter given; expected a " + "label parameter.",
+                    pos);
         }
 
         throw new SemanticException("Parameter " + param + " is not a label.",
@@ -86,12 +87,14 @@ public class SubtypeChecker {
         }
 
         if (param == null) {
-            throw new SemanticException("No parameter given; expected a "
-                    + "principal parameter.", pos);
+            throw new SemanticException(
+                    "No parameter given; expected a " + "principal parameter.",
+                    pos);
         }
 
-        throw new SemanticException("Parameter " + param
-                + " is not a principal.", param.position());
+        throw new SemanticException(
+                "Parameter " + param + " is not a principal.",
+                param.position());
     }
 
     /**
@@ -102,10 +105,9 @@ public class SubtypeChecker {
      */
     private void addParamConstraints(LabelChecker lc, Position pos,
             JifClassType supertype, JifClassType subtype)
-            throws SemanticException {
-        if (Report.should_report(Report.types, 2))
-            Report.report(2, "Adding param constraints: " + supertype + " >= "
-                    + subtype);
+                    throws SemanticException {
+        if (Report.should_report(Report.types, 2)) Report.report(2,
+                "Adding param constraints: " + supertype + " >= " + subtype);
 
         JifContext A = lc.jifContext();
 
@@ -131,20 +133,19 @@ public class SubtypeChecker {
                 final Type lOrigSubtype = origSubtype;
                 final Type lOrigSupertype = origSupertype;
                 lc.constrain(
-                        new NamedLabel("sub_param_" + count, StringUtil
-                                .nth(count)
-                                + " param of subtype "
-                                + lOrigSubtype, label(subParam, pos)),
+                        new NamedLabel("sub_param_" + count,
+                                StringUtil.nth(count) + " param of subtype "
+                                        + lOrigSubtype,
+                                label(subParam, pos)),
                         kind,
-                        new NamedLabel("sup_param_" + count, StringUtil
-                                .nth(count)
-                                + " param of supertype "
-                                + lOrigSupertype, label(supParam, pos)), A
-                                .labelEnv(), pos, new ConstraintMessage() {
+                        new NamedLabel("sup_param_" + count,
+                                StringUtil.nth(count) + " param of supertype "
+                                        + lOrigSupertype,
+                                label(supParam, pos)),
+                        A.labelEnv(), pos, new ConstraintMessage() {
                             @Override
                             public String msg() {
-                                return lOrigSubtype
-                                        + " is not a subtype of "
+                                return lOrigSubtype + " is not a subtype of "
                                         + lOrigSupertype
                                         + ", since the subtype relation between label "
                                         + "parameters is not satisfied.";
@@ -152,22 +153,16 @@ public class SubtypeChecker {
 
                             @Override
                             public String detailMsg() {
-                                String variance =
-                                        pi.isInvariantLabel() ? "invariant"
-                                                : "covariant";
-                                String reln =
-                                        kind() == LabelConstraint.EQUAL ? "equal to"
-                                                : "less restrictive than";
-                                return lOrigSubtype
-                                        + " is not a subtype of "
+                                String variance = pi.isInvariantLabel()
+                                        ? "invariant" : "covariant";
+                                String reln = kind() == LabelConstraint.EQUAL
+                                        ? "equal to" : "less restrictive than";
+                                return lOrigSubtype + " is not a subtype of "
                                         + lOrigSupertype
-                                        + ". Subtyping requires "
-                                        + "the "
+                                        + ". Subtyping requires " + "the "
                                         + StringUtil.nth(count)
                                         + " parameter of the subtype to be "
-                                        + reln
-                                        + " the "
-                                        + StringUtil.nth(count)
+                                        + reln + " the " + StringUtil.nth(count)
                                         + " parameter of the supertype, since that "
                                         + "parameter is " + variance + ".";
                             }
@@ -178,19 +173,16 @@ public class SubtypeChecker {
                         A.labelEnv(), pos, new ConstraintMessage() {
                             @Override
                             public String msg() {
-                                return origSubtype
-                                        + " is not a subtype of "
+                                return origSubtype + " is not a subtype of "
                                         + origSupertype
                                         + ", since the principals are not equivalent.";
                             }
 
                             @Override
                             public String detailMsg() {
-                                return origSubtype
-                                        + " is not a subtype of "
+                                return origSubtype + " is not a subtype of "
                                         + origSupertype
-                                        + ". Subtyping requires "
-                                        + "the "
+                                        + ". Subtyping requires " + "the "
                                         + StringUtil.nth(count)
                                         + " parameter of the subtype to be equivalent to the "
                                         + StringUtil.nth(count)
@@ -209,9 +201,8 @@ public class SubtypeChecker {
     private boolean recursiveAddSubtypeConstraints(LabelChecker lc,
             Position pos, Type supertype, Type subtype,
             final boolean inNonConstArrayType) throws SemanticException {
-        if (Report.should_report(Report.types, 2))
-            Report.report(2, "Adding subtype constraints: " + supertype
-                    + " >= " + subtype);
+        if (Report.should_report(Report.types, 2)) Report.report(2,
+                "Adding subtype constraints: " + supertype + " >= " + subtype);
 
         JifTypeSystem ts = lc.jifTypeSystem();
         JifContext A = lc.jifContext();
@@ -226,22 +217,21 @@ public class SubtypeChecker {
             final Type lOrigSubtype = origSubtype;
             final Type lOrigSupertype = origSupertype;
             lc.constrain(
-                    new NamedLabel("label of type " + subtype, ts
-                            .labelOfType(subtype)),
+                    new NamedLabel("label of type " + subtype,
+                            ts.labelOfType(subtype)),
                     LabelConstraint.LEQ,
-                    new NamedLabel("label of type " + supertype, ts
-                            .labelOfType(supertype)), A.labelEnv(), pos, !(ts
-                            .labelOfType(subtype) instanceof VarLabel || ts
-                            .labelOfType(supertype) instanceof VarLabel),
+                    new NamedLabel("label of type " + supertype,
+                            ts.labelOfType(supertype)),
+                    A.labelEnv(), pos,
+                    !(ts.labelOfType(subtype) instanceof VarLabel
+                            || ts.labelOfType(supertype) instanceof VarLabel),
                     new ConstraintMessage() {
                         @Override
                         public String msg() {
-                            String s =
-                                    lOrigSubtype + " is not a subtype of "
-                                            + lOrigSupertype + ".";
+                            String s = lOrigSubtype + " is not a subtype of "
+                                    + lOrigSupertype + ".";
                             if (inNonConstArrayType) {
-                                s +=
-                                        " The base type of arrays must be equivalent.";
+                                s += " The base type of arrays must be equivalent.";
                             }
                             return s;
                         }
@@ -249,8 +239,7 @@ public class SubtypeChecker {
                         @Override
                         public String detailMsg() {
                             if (inNonConstArrayType) {
-                                return lOrigSubtype
-                                        + " is not a subtype of "
+                                return lOrigSubtype + " is not a subtype of "
                                         + lOrigSupertype
                                         + ". Subtyping requires "
                                         + "the base types of arrays to be equivalent.";
@@ -332,9 +321,8 @@ public class SubtypeChecker {
             }
             if (superIsConst) {
                 // sub must be const
-                if (!subIsBoth
-                        && (!(unlblSubtype instanceof ConstArrayType) || !((ConstArrayType) unlblSubtype)
-                                .isConst())) {
+                if (!subIsBoth && (!(unlblSubtype instanceof ConstArrayType)
+                        || !((ConstArrayType) unlblSubtype).isConst())) {
                     throw new SemanticException(
                             "A normal array is not a subtype of a const array",
                             pos);

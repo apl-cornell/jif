@@ -83,8 +83,8 @@ public class AccessPathConstant extends AccessPathRoot {
     @Override
     public AccessPath subst(AccessPathRoot r, AccessPath e) {
         throw new InternalCompilerError(
-                "Shouldn't be calling subst on an AccessPathConstant! \""
-                        + this + "\"");
+                "Shouldn't be calling subst on an AccessPathConstant! \"" + this
+                        + "\"");
     }
 
     @Override

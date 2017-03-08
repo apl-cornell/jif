@@ -28,25 +28,25 @@ public class JifSpecialExt extends JifExprExt {
     JifTypeSystem ts = (JifTypeSystem) visitor.typeSystem();
     JifNodeFactory nf = (JifNodeFactory) visitor.nodeFactory();
     Position pos = node().position();
-
+    
     if (vi.isCovariantLabel()) {
         // <covariant label uid> => <covariant-label uid>
         Label L = ts.covariantLabel(pos, vi.uid());
         return L;
     }
-
+    
     if (vi.isInvariantLabel()) {
         // <param label uid> => <label-param uid>
         Label L = ts.paramLabel(pos, vi.uid());
         return L;
     }
-
+    
     if (vi.isPrincipal()) {
         // <param principal uid> => <principal-param uid>
         Principal p = ts.principalParam(pos, vi.uid());
         return p;
     }
-
+    
     throw new SemanticException("Unrecognized parameter type for " + vi,
     	                    pos);
     }
@@ -66,9 +66,8 @@ public class JifSpecialExt extends JifExprExt {
 
         JifClassType ct = (JifClassType) ts.unlabel(se.type());
 
-        se =
-                (Special) se.type(ts.labeledType(se.position(), ct,
-                        ct.thisLabel()));
+        se = (Special) se
+                .type(ts.labeledType(se.position(), ct, ct.thisLabel()));
 
         PathMap X = ts.pathMap();
         X = X.N(A.pc());

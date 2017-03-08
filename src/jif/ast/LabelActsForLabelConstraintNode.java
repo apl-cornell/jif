@@ -13,6 +13,6 @@ import jif.types.label.Label;
  * a procedure header.
  * </p>
  */
-public interface LabelActsForLabelConstraintNode extends
-        ActsForConstraintNode<Label, Label> {
+public interface LabelActsForLabelConstraintNode
+        extends ActsForConstraintNode<Label, Label> {
 }
