@@ -47,7 +47,7 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
         } else if (n instanceof ConstructorCall) {
             ConstructorCall cc = (ConstructorCall) n;
             if (cc.kind() == ConstructorCall.SUPER
-                    && superClassCouldAccessFinals(currCBI.currClass)) {
+                    && superClassCouldAccessFinals(curCBI.curClass)) {
                 // go through every final non-static field in dfIn.assignmentStatus
                 for (Entry<VarInstance, AssignmentStatus> e : dfIn.assignmentStatus
                         .entrySet()) {
