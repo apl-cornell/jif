@@ -22,6 +22,25 @@
     <property file="${basedir}/config.properties" />
     <echo message="polyglot.home is ${polyglot.home}" level="verbose" />
 
+    <!-- Sometimes java.home points to the jdk but sometimes it points to JDK_DIR/jre -->
+    <!-- See https://stackoverflow.com/questions/16533256/where-does-ant-set-its-java-home-and-is-it-wrong-and-is-it-supposed-to-appen/16534705#16534705 -->
+    <condition property="jdk.home" value="${java.home}">
+      <available file="${java.home}/include"/>
+    </condition>
+    <condition property="jdk.home" value="${java.home}/..">
+      <and>
+        <matches string="${java.home}" pattern="/jre(|/)$"/>
+        <available file="${java.home}/../include"/>
+      </and>
+    </condition>
+
+    <condition property="env.OSTYPE" value="darwin">
+      <and>
+        <not><isset property="env.OSTYPE" /></not>
+        <os family="mac" />
+      </and>
+    </condition>
+
     <!-- source directory -->
     <property name="src" location="${basedir}/src" />
 
