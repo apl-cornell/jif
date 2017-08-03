@@ -30,8 +30,8 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
     }
 
     @Override
-    protected void checkOther(FlowGraph<FlowItem> graph, Node n, FlowItem dfIn)
-            throws SemanticException {
+    protected void checkOther(FlowGraph<FlowItem> graph, Node n, FlowItem dfIn,
+            FlowItem dfOut) throws SemanticException {
         if (n instanceof TypeNode) {
             // need to check type nodes for uses of locals.
             TypeNode tn = (TypeNode) n;
@@ -47,7 +47,7 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
         } else if (n instanceof ConstructorCall) {
             ConstructorCall cc = (ConstructorCall) n;
             if (cc.kind() == ConstructorCall.SUPER
-                    && superClassCouldAccessFinals(currCBI.currClass)) {
+                    && superClassCouldAccessFinals(curCBI.curClass)) {
                 // go through every final non-static field in dfIn.assignmentStatus
                 for (Entry<VarInstance, AssignmentStatus> e : dfIn.assignmentStatus
                         .entrySet()) {
@@ -55,7 +55,7 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
                             && ((FieldInstance) e.getKey()).flags().isFinal()
                             && !((FieldInstance) e.getKey()).flags()
                                     .isStatic()) {
-                        // we have a final non-static field                           
+                        // we have a final non-static field
                         FieldInstance fi = (FieldInstance) e.getKey();
                         AssignmentStatus initCount = e.getValue();
                         if (!initCount.definitelyAssigned) {
@@ -87,7 +87,7 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
             return false;
         else if (!ts.isSignature(ct) && ts.isSignature(ct.superType())
                 && ts.hasUntrustedAncestor(ct) == null) {
-            // extends a java class with a signature, and all ancestors 
+            // extends a java class with a signature, and all ancestors
             // of that java class have signatures (are trusted).
             return false;
         } else {
@@ -102,7 +102,7 @@ public class JifInitChecker extends DefiniteAssignmentChecker {
 //        AssignmentStatus initCount =
 //                dfIn.assignmentStatus.get(l.fieldInstance().orig());
 //        if (initCount == null || !initCount.definitelyAssigned) {
-//            // the local variable may not have been initialized. 
+//            // the local variable may not have been initialized.
 //            // However, we only want to complain if the local is reachable
 //            if (l.reachable()) {
 //                throw new SemanticException("Local variable \"" + l.name()
