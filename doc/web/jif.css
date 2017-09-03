@@ -1,0 +1,61 @@
+p, ol, ul, td {font-family: "Times New Roman", times, serif}
+a {text-decoration: none}
+h1, h2, h3, p.downloads {font-family: "Goudy Old Stout", "Goudy Old Style", "Palatino", "Garamond", "Goudy", "Bookman Medium","Bookman Old Style","urw bookman l", bookman, serif; color: #513c20; font-weight: bold}
+span.emph { color: #b12039 }
+p.downloads {font-size: 120%}
+p.listpara {padding-left: 30px; padding-right: 0px}
+h1 { font-size: 300%; white-space: nowrap }
+h2 { font-size: 140% }
+h3 { font-size: 120% }
+body { margin: 0; background-color: white }
+td.title { background-color: #d5d8a0; height: 100px }
+td.sidebar { width: 200px; background-color: #d5d8a0; padding-left: 5px;
+padding-right: 5px }
+td.inset { padding: 15px 15px 0 15px; border-style: solid;
+	   border-right-width: 0; border-bottom-width: 0;
+	   border-top-width: 1px; border-left-width: 1px;
+	   border-color: #808060; background-color: #ffe;
+	   }
+td.insetcont { padding:0 15px 15px 15px; border-style:solid;
+	       border-right-width:0; border-bottom-width:0;
+	       border-left-width: 1px; border-top-width:0;
+	       border-color: #808060; background-color: #ffe; }
+
+label { color: red }
+
+
+a {color: #444; font-weight: 500}
+a cite, cite, cite a { font-style: normal; font-weight: 600; color: #448 }
+
+body.download {background-color: #ffc}
+div.content {margin: 10ex; background-color: white; padding: 0ex 5ex 1ex 5ex;
+  min-width: 600px;
+  border-style: solid; border-width: 1px; border-color: black}
+td.insetcont p, td.inset p {max-width: 80ex; text-align: justify}
+td.question {text-align: right; vertical-align: top; font-weight: bold}
+div.download_button {max-width: 80ex; text-align: center}
+div.publist { margin-right: 3em }
+
+div.publist ul li {padding-bottom: 0.7ex}
+div.publist ol li {padding-bottom: 0.5ex}
+
+form.questionnaire {
+    padding: 2ex;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #bbb;
+    background-color: #eee;}
+
+input.download_button {
+    background-color: #006295;
+    color: white;
+    border-style: outset;
+    border-color: blue;
+    font-size: 130%
+}
+
+p.acknowledgements { max-width: 60ex; font-size: 90% }
+
+input.provide_button { margin: 0.5ex }
+input.no_info_button { margin: 0.5ex }
+img.logo {float: left}
