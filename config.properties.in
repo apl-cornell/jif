@@ -5,7 +5,7 @@
 #   This is optional if the Polyglot JARs are in the lib directory.
 #   Must be an absolute path.
 #
-#polyglot.home=${env.HOME}/polyglot
+#polyglot.home=/Users/Elizabeth/Desktop/MEng_Project/polyglot
 
 
 # JDK installation dilectory.
