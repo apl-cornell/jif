@@ -92,8 +92,9 @@ jif-runtime-native.java-include-dir=/Library/Java/JavaVirtualMachines/jdk1.8.0_1
   1. **Check $JAVA_HOME/lib/security** for **local_policy.jar** and **US_export_policy.jar** (or possibly **jce.jar** if running a different version of Java)
     * If this directory does not exist, then create it
     * Download the JCE package matching your version of Java: [JCE.jar 8](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
-  2. `cp config.properties.in config.properties`
-  3. Edit the config.properties file (ensure that you put the full path to the respective directories)
+  2. `cd $FABRIC`
+  3. `cp config.properties.in config.properties`
+  4. Edit the config.properties file (ensure that you put the full path to the respective directories)
   
 ```
 # Fabric configuration properties.
@@ -142,6 +143,6 @@ jif.home=<path>/jif
 polyglot.home=<path>/polyglot
 ```
      
-  4. `ant configure`
-  5. `ant`
+  5. `ant configure`
+  6. `ant`
   
