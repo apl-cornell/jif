@@ -618,7 +618,7 @@ public class LabelUtil {
         return meet(p1, p2);
     }
 
-    public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {
+    public IntegPolicy meet(IntegPolicy p1, IntegPolicy p2) {
         return meet(p1, p2, true);
     }
 
