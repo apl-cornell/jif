@@ -430,6 +430,12 @@ public class LabelUtil {
         }
     }
 
+    // This method is exposed in the Jif signature. It cannot be named "meet"
+    // because that conflicts with the "meet" keyword in Jif.
+    public Label meetLbl(Label l1, Label l2) {
+        return meet(l1, l2);
+    }
+
     public Label meet(Label l1, Label l2) {
         return meet(l1, l2, true);
     }
@@ -481,6 +487,10 @@ public class LabelUtil {
         }
     }
 
+    public ConfPolicy join(ConfPolicy p1, ConfPolicy p2) {
+        return join(p1, p2, true);
+    }
+
     public ConfPolicy join(ConfPolicy p1, ConfPolicy p2, boolean simplify) {
         try {
             enterTiming();
@@ -515,6 +525,10 @@ public class LabelUtil {
             exitTiming();
         }
 
+    }
+
+    public IntegPolicy join(IntegPolicy p1, IntegPolicy p2) {
+        return join(p1, p2, true);
     }
 
     public IntegPolicy join(IntegPolicy p1, IntegPolicy p2, boolean simplify) {
@@ -553,6 +567,16 @@ public class LabelUtil {
 
     }
 
+    // This method is exposed in the Jif signature. It cannot be named "meet"
+    // because that conflicts with the "meet" keyword in Jif.
+    public ConfPolicy meetPol(ConfPolicy p1, ConfPolicy p2) {
+        return meet(p1, p2);
+    }
+
+    public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {
+        return meet(p1, p2, true);
+    }
+
     public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2, boolean simplify) {
         try {
             enterTiming();
@@ -586,6 +610,16 @@ public class LabelUtil {
         } finally {
             exitTiming();
         }
+    }
+
+    // This method is exposed in the Jif signature. It cannot be named "meet"
+    // because that conflicts with the "meet" keyword in Jif.
+    public IntegPolicy meetPol(IntegPolicy p1, IntegPolicy p2) {
+        return meet(p1, p2);
+    }
+
+    public ConfPolicy meet(ConfPolicy p1, ConfPolicy p2) {
+        return meet(p1, p2, true);
     }
 
     public IntegPolicy meet(IntegPolicy p1, IntegPolicy p2, boolean simplify) {
