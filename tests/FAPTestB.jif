@@ -1,0 +1,5 @@
+public class FAPTestB {
+  void m() {
+    final FAPTestA a = new FAPTestA();
+  }
+}
