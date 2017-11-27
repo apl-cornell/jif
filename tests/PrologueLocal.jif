@@ -1,0 +1,11 @@
+import jif.util.*;
+
+public class PrologueLocal[label L] {
+  final int foo;
+  public PrologueLocal() {
+    int bar = 5;
+    foo = bar;
+    super();
+    int garply = bar;
+  }
+}
