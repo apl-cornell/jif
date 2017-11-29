@@ -6,7 +6,8 @@ public class ParamTest01[label T] {
 		this.id = id;
 	}
 
+        // Should work since {T} == T
 	public static ParamTest01[T]{T} createInstance{T}(String{T} id) {
 		return new ParamTest01[T](id);
-	}	
+	}
 }

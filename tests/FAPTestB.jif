@@ -1,3 +1,5 @@
+// This should work but compiler was throwing an error regarding final access
+// paths.
 public class FAPTestB {
   void m() {
     final FAPTestA a = new FAPTestA();

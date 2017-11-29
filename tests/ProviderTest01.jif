@@ -1,7 +1,7 @@
 public class ProviderTest01 {
   public String {*←} name;
 
-  public ProviderTest(String{*←} name) {
+  public ProviderTest01(String{*←} name) {
     this.name = name;
   }
 }

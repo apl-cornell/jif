@@ -6,6 +6,7 @@ public class PrologueLocal[label L] {
     int bar = 5;
     foo = bar;
     super();
+    // bar should be visible after the prologue
     int garply = bar;
   }
 }
