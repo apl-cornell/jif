@@ -196,7 +196,6 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
     Constraints4.jif (Semantic, "may return a value with a more restrictive label") ; # Not sure what this is testing wrt constraints.
     Constraints5.jif ;
     Constraints6.jif (Semantic, "not less restrictive than the label for local variable") ; # Not sure what this is testing wrt constraints.
-    Constraints7.jif ;
     ConstructorTest.jif ;
     ConstructorTest01.jif ; # I'm not sure this should work?
     Constructor1.jif ;
