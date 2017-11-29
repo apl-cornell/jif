@@ -88,8 +88,6 @@ jif.ExtensionInfo  "-d out -nonrobust -classpath ../classes:../lib-classes:../li
     Array20.jif ;
     ArrayBaseLabel01.jif (Semantic, "base type of arrays must be equivalent"), ();
     ArrayLeak.jif (Semantic, "not a subtype"), () ;
-    # Removed the problematics String.getBytes method from the String signature
-    ArrayLeak2.jif (Semantic, "not a subtype") ;
     ArrayLeak3.jif (Semantic, "does not currently support") ;
     ArrayLeak4.jif (Semantic, "does not currently support") ;
     ArrayLeak5.jif (Semantic, "not less restrictive"), () ;

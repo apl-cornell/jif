@@ -1,7 +1,7 @@
 public class ArrayLeak2 {
     String{Alice:} s;
     byte{}[]{}      b;
-                                                                               
+
     public void bar{}():{Alice:}
         throws (NullPointerException, StringIndexOutOfBoundsException)
     {
