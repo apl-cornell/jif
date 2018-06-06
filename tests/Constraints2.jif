@@ -1,5 +1,5 @@
 public class Constraints2 {
-    // causes the constraint solver (as of 5/31/02) to go into 
+    // causes the constraint solver (as of 5/31/02) to go into
     // an infinite loop.
 
     // the (problematic) constraints to be solved are:
@@ -13,13 +13,13 @@ public class Constraints2 {
     // the loop works by moving the upper bounds of v, w and x
     // between {Alice:} and {Bob:}, by using the actsfor constraint
     // to change the relationship between these two labels.
-    // 
+    //
     // Note that the constraints must be solved in this order,
     // otherwise it is possible for all three variables to have the
     // same upper bound at the same time, whereupon the constraint solver
     // will stop and evaluate its candidate solution.
 
-    // The constraints solver changes the upper bounds of the 
+    // The constraints solver changes the upper bounds of the
     // variables as follows:
     // Variable:      v    w    x
     //                     A    B
@@ -47,11 +47,11 @@ public class Constraints2 {
 	a = w;  b = x;
 
 	// the six bad constraints, in order.
-	actsFor(Alice, Bob) { x = v; }
-	actsFor(Bob, Alice) { w = x; }
-	actsFor(Alice, Bob) { v = w; }
-	actsFor(Bob, Alice) { x = v; }
-	actsFor(Alice, Bob) { w = x; }
-       	actsFor(Bob, Alice) { v = w; }
+	if (Alice actsFor Bob) { x = v; }
+	if (Bob actsFor Alice) { w = x; }
+	if (Alice actsFor Bob) { v = w; }
+	if (Bob actsFor Alice) { x = v; }
+	if (Alice actsFor Bob) { w = x; }
+       	if (Bob actsFor Alice) { v = w; }
     }
 }

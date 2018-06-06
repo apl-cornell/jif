@@ -11,7 +11,7 @@ public class Declassify2 {
 
 	int s = declassify(a, {Alice:Bob; this});
 	foo(s);
-	return s;	    
+	return s;
     }
 
     static void foo(int{Alice:Bob} x) { }
