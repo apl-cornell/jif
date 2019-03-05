@@ -408,7 +408,7 @@ public interface JifTypeSystem extends ParamTypeSystem<ParamInstance, Param> {
      * Exposes utility method of TypeSystem_c
      */
     @Override
-    boolean isAccessible(MemberInstance mi, ClassType contextClass);
+    boolean isAccessible(MemberInstance mi, ReferenceType contextType);
 
     /** Returns a new label constraint system solver. */
     Solver createSolver(String solverName);
