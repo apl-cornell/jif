@@ -821,7 +821,7 @@ override constructor_body ::=
 
 explicit_super_constructor_invocation ::=
                     // Stmt
-        SUPER_:a LPAREN argument_list_opt:b RPAREN:y SEMICOLON
+        SUPER:a LPAREN argument_list_opt:b RPAREN:y SEMICOLON
             {: RESULT = parser.nf.SuperCall(parser.pos(a,y), b); :}
     ;
     
@@ -1150,7 +1150,7 @@ override array_creation_expression ::=
 
 override field_access ::=
                     // Field
-        SUPER_:n DOT IDENTIFIER:a
+        SUPER:n DOT IDENTIFIER:a
             {: RESULT = parser.nf.Field(parser.pos(a),
                 parser.nf.Super(parser.pos(n)),
                 parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
@@ -1161,7 +1161,7 @@ override field_access ::=
     
 override method_invocation ::=
                     // Call
-       SUPER_:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
+       SUPER:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
             {: RESULT = parser.nf.Call(parser.pos(a,d, b),
                 parser.nf.Super(parser.pos(a)),
                 parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}
