@@ -1,0 +1,12 @@
+import jif.util.*;
+
+public class PrologueLocal[label L] {
+  final int foo;
+  public PrologueLocal() {
+    int bar = 5;
+    foo = bar;
+    super();
+    // bar should be visible after the prologue
+    int garply = bar;
+  }
+}

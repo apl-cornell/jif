@@ -1,3 +1,5 @@
+// This should compile but (as of b7ed3ae) this does not compile due to problems
+// with handling projections in the label checker.
 public class CheckedEndorse04 authority(*) {
   void m{*L}(final label{*L} L, principal{*L}p)
       where authority (p), {*L} <= {⊤->⊤; p←p} {

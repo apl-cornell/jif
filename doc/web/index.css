@@ -293,3 +293,5 @@ border: 1px solid black;
 padding: 0.5ex; }
 .xbutton { position: absolute; top: 0px; right: 4px; cursor: pointer; font-weight: bold; font-family: Times, serif; font-size: 12pt }
 .link { color: #008; cursor: zoom-in }
+#publist li { padding-top: 1ex }
+#publist li p.paperinfo { text-indent: 2em; margin-top: 0.5ex; margin-bottom: 0.5ex }

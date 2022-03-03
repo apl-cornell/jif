@@ -1691,8 +1691,8 @@ public class JifTypeSystem_c extends ParamTypeSystem_c<ParamInstance, Param>
     }
 
     @Override
-    public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
-        return super.isAccessible(mi, contextClass);
+    public boolean isAccessible(MemberInstance mi, ReferenceType contextType) {
+        return super.isAccessible(mi, contextType);
     }
 
     @Override
