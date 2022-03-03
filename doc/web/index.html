@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Jif</title>
+<link rel="stylesheet" type="text/css" href="index.css"/>
+<link rel="icon" href="images/jif-logo-small.ico"
+    type="image/vnd.microsoft.icon"/>
+<script src="ezdom.js" type="text/javascript"></script>
+</head>
+
+<body>
+  <div style="position: absolute; min-width: 42em; width: 100%; overflow: visible; height: 0">
+    <img id="logo" alt="Jif logo" src="images/jif-logo-med.png"/>
+  </div>
+  <header id="top">
+    <div></div>
+    <div class="nav-width"></div>
+    <div class="banner">
+      <h1>
+        <span class="emph" style="display: none">Jif:</span>
+        <span class="emph">J</span>ava +
+        <span class="emph">i</span>nformation
+        <span class="emph">f</span>low
+      </h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="ide/">Jif IDE</a></li>
+        <li><a href="#download-banner">downloads</a></li>
+        <li><a href="#publist">publications</a></li>
+        <li><a href="#mailing-list">mailing list</a></li>
+        <li><a href="#developers">developers</a></li>
+      </ul>
+    </nav>
+    <div></div>
+  </header>
+
+  <main style="position: relative">
+    <section id="download-banner">
+      <div>
+        <form
+            method="POST"
+            action="/w8/~andru/cgi-bin/download.pl"
+            enctype="multipart/form-data">
+          <input type="hidden" name="package" value="Jif 3.5"/>
+          <input type="hidden" name="style" value="/jif/jif.css"/>
+          <input type="hidden" name="url"
+              value="/jif/releases/jif-3.5.0.zip"/>
+          <input type="hidden" name="logo"
+              value='<img class="logo" src="/jif/images/jif-logo-med.png">'/>
+          <input class="download-button" type="submit"
+              value="Download Jif 3.5"/>
+        </form>
+      </div>
+      <div>
+        <form action="ide/">
+          <input class="download-button" type="submit"
+              value="Install Jif IDE"/>
+        </form>
+      </div>
+    </section>
+
+    <section id="doc-banner" class="highlight">
+      <div>
+        <a href="doc/jif-3.3.0/manual.html">Reference manual</a>
+      </div>
+      <div>
+        <a href="doc/jif-3.3.0/jifc-api/">Javadoc</a>
+      </div>
+      <div>
+        <a href="CHANGES.txt">Change log</a>
+      </div>
+    </section>
+
+    <section id="mailing-list" class="highlight">
+      <div>
+        <h2>Mailing list</h2>
+        <p>Sign up for news about Jif!</p>
+        <p>(open subscription, low traffic)</p>
+      </div>
+
+      <div id="mailing-list-js">
+        <form>
+          <input type="text" name="email"
+              placeholder="enter your email" size="15"/>
+          <input type="button" value="Join"
+              onclick="joinMailingList(this.form)"/>
+        </form>
+      </div>
+
+      <div id="mailing-list-noscript">
+        <p>
+          Send mail to
+          <a class="mailing-list"
+              href="mailto:jif-users-l-request@cornell.edu?subject=join">
+            jif-users-l-request@cornell.edu
+          </a>
+          with a subject line of
+          <code style="font-weight: bold">join</code>.
+          Or turn on JavaScript to see the sign-up form.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <p>
+        Jif is a security-typed programming language that extends
+        Java with support for information flow control and access
+        control, enforced at both compile time and run time. The
+        source code for the Jif compiler and run-time system is
+        available for
+        <a href="releases/jif-3.5.0.zip">download</a>.
+        Jif is written in Java and is built using the
+        <a href="/projects/polyglot/">Polyglot</a> extensible
+        Java compiler framework.
+      </p>
+      <p>
+        Static information flow control can protect the
+        confidentiality and integrity of information manipulated
+        by computing systems. The compiler tracks the
+        correspondence between information the policies that
+        restrict its use, enforcing security properties
+        end-to-end within the system. After checking information
+        flow within Jif programs, the Jif compiler translates
+        them to Java programs and uses an ordinary Java compiler
+        to produce secure executable programs.
+      </p>
+      <p>
+        Jif extends Java by adding labels that express
+        restrictions on how information may be used. For example,
+        the following variable declaration declares not only that
+        the variable <code>x</code> is an <code>int</code>, but
+        also that the information in <code>x</code> is governed
+        by a security policy:
+      </p>
+      <pre>int {Alice→Bob} x;</pre>
+      <p>
+        In this case, the security policy says that the
+        information in <code>x</code> is controlled by the
+        principal Alice, and that Alice permits this information
+        to be seen by the principal Bob. The policy
+        <code>{Alice←Bob}</code> means that information is owned
+        by Alice, and that Alice permits it to be affected by
+        Bob. Based on label annotations like these, the Jif
+        compiler analyzes information flows within programs, to
+        determine whether they enforce the confidentiality and
+        integrity of information.
+      </p>
+      <p>
+        Other systems that provide related functionality are the
+        <a href="http://cristal.inria.fr/~simonet/soft/flowcaml/">
+          Flow Caml
+        </a>
+        and
+        <a href="http://libre.adacore.com/home/products/sparkpro/">
+          SPARK/Ada
+        </a>
+        languages. Jif provides richer support for tying security
+        requirements to programs, with important features like
+        selective, robust downgrading, language-based access
+        control, and dynamic labels and principals. These
+        features are crucial for language-based reasoning about
+        security in complex applications.
+      </p>
+      <p>
+        <a href="ide/">Jif IDE</a> is an Eclipse IDE plug-in for
+        Jif, built using the
+        <a href="/projects/polyglot/ide/">Polyglot IDE</a>
+        framework.
+        <a href="http://siis.cse.psu.edu/jifclipse/">Jifclipse</a>
+        is another Eclipse-based IDE for Jif developed at Penn
+        State. It tends not to support the latest version of Jif,
+        however.
+      </p>
+    </section>
+
+    <section class="links">
+      <div id="developers" class="three-cols">
+        <div>
+          <h3>Project members</h3>
+          <ul>
+            <li><a href="/andru/">Andrew Myers</a> (faculty)</li>
+            <li><a href="/~owen/">Owen Arden</a></li>
+            <li><a href="/~liujed/">Jed Liu</a></li>
+            <li><a href="/~tmagrino/">Tom Magrino</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Past contributors</h3>
+          <ul>
+            <li><a href="/~schong/">Stephen Chong</a></li>
+            <li><a href="/nystrom/">Nate Nystrom</a></li>
+            <li><a href="/~kvikram/">K. Vikram</a></li>
+            <li><a href="/zdance/">Steve Zdancewic</a></li>
+            <li><a href="/~zhangdf/">Danfeng Zhang</a></li>
+            <li><a href="/zlt/">Lantian Zheng</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="three-cols highlight">
+        <div>
+          <h3>Development tools</h3>
+          <ul>
+            <li><a href="ide/">Jif IDE</a></li>
+            <li>
+              <a href="http://siis.cse.psu.edu/jifclipse">
+                Jifclipse (Penn State)
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>Jif web app systems</h3>
+          <ul>
+            <li><a href="sif/">SIF</a></li>
+            <li><a href="swift/">Swift</a></li>
+            <li><a href="/projects/fabric/">Fabric</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Selected Jif apps</h3>
+          <ul>
+            <li><a href="/projects/civitas/">Civitas</a></li>
+            <li>
+              <a href="http://siis.cse.psu.edu/jpmail/">
+                JPmail (Penn State)
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Release history</h2>
+
+      <table class="release-history">
+        <caption>Release history</caption>
+        <thead>
+          <tr>
+            <th scope="col">Version</th>
+            <th scope="col">Release date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <form
+                  method="POST"
+                  action="/w8/~andru/cgi-bin/download.pl"
+                  enctype="multipart/form-data">
+                <input type="hidden" name="package" value="Jif 3.5.0"/>
+                <input type="hidden" name="style" value="/jif/jif.css"/>
+                <input type="hidden" name="url"
+                    value="/jif/releases/jif-3.5.0.zip"/>
+                <input type="hidden" name="logo"
+                    value='<img class="logo" src="/jif/images/jif-logo-med.png">'/>
+                <input class="download-button" type="submit"
+                    value="Jif 3.5.0"/>
+              </form>
+            </td>
+            <td>June 24, 2016</td>
+          </tr>
+          <tr>
+            <td>
+              <form
+                  method="POST"
+                  action="/w8/~andru/cgi-bin/download.pl"
+                  enctype="multipart/form-data">
+                <input type="hidden" name="package" value="Jif 3.4.3"/>
+                <input type="hidden" name="style" value="/jif/jif.css"/>
+                <input type="hidden" name="url"
+                    value="/jif/releases/jif-3.4.3.zip"/>
+                <input type="hidden" name="logo"
+                    value='<img class="logo" src="/jif/images/jif-logo-med.png">'/>
+                <input class="download-button" type="submit"
+                    value="Jif 3.4.3"/>
+              </form>
+            </td>
+            <td>September 18, 2015</td>
+          </tr>
+          <tr>
+            <td>
+              <form
+                  method="POST"
+                  action="/w8/~andru/cgi-bin/download.pl"
+                  enctype="multipart/form-data">
+                <input type="hidden" name="package" value="Jif 3.3.1"/>
+                <input type="hidden" name="style" value="/jif/jif.css"/>
+                <input type="hidden" name="url"
+                    value="/jif/releases/jif-3.3.1.zip"/>
+                <input type="hidden" name="logo"
+                    value='<img class="logo" src="/jif/images/jif-logo-med.png">'/>
+                <input class="download-button" type="submit"
+                    value="Jif 3.3.1"/>
+              </form>
+            </td>
+            <td>February 2009</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="publist">
+      <h2>Related group publications</h2>
+      <ol>
+<!--- Begin jif-pubs.html -->
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/nmifc">Nonmalleable information flow control</a></span><br/>
+<p class=paperinfo>A type system enforcing a dual hyperproperty that constrains the use of endorsement.</p>
+<span class="conferencename">
+<a href="https://www.sigsac.org/ccs/CCS2017">
+24<span class=ordinal>th</span> ACM Conf.&nbsp;on Computer and Communications Security (CCS)</a></span>,
+October 2017.
+
+
+Ethan Cecchetti, Andrew C. Myers, and Owen Arden.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{nmifc,
+title="Nonmalleable information flow control",
+author="Ethan Cecchetti and Andrew C. Myers and Owen Arden",
+booktitle="24th ACM Conf.&nbsp;on Computer and Communications Security (CCS)",
+url="http://www.cs.cornell.edu/andru/papers/nmifc",
+month="October",
+year="2017"}</span>
+|&nbsp;<a href="https://arxiv.org/abs/1708.08596">TR</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="https://arxiv.org/abs/1708.08596">Nonmalleable information flow control: technical report</a></span><br/>
+<p class=paperinfo>A type system enforcing a dual hyperproperty that constrains the use of endorsement.</p>
+Technical report null, Cornell University Computing and Information Science,
+August 2017.
+
+
+Ethan Cecchetti, Andrew C. Myers, and Owen Arden.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{nmifc-tr,
+title="Nonmalleable information flow control: technical report",
+author="Ethan Cecchetti and Andrew C. Myers and Owen Arden",
+institution="Cornell University Computing and Information Science",
+url="https://arxiv.org/abs/1708.08596",
+month="August",
+year="2017"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/dac17">Secure information flow verification with mutable dependent types</a></span><br/>
+<p class=paperinfo>Fully compile-time enforcement of dependent labels in a security-typed HDL</p>
+<span class="conferencename">
+<a href="https://dac.com">
+54<span class=ordinal>th</span> Design Automation Conference (DAC)</a></span>,
+June 2017.
+
+
+Andrew Ferraiuolo, Weizhe Hua, Andrew C. Myers, and G. Edward Suh.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{FHMS17,
+title="Secure information flow verification with mutable dependent types",
+author="Andrew Ferraiuolo and Weizhe Hua and Andrew C. Myers and G. Edward Suh",
+booktitle="54th Design Automation Conference (DAC)",
+url="http://www.cs.cornell.edu/andru/papers/dac17",
+month="June",
+year="2017"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/jfabric">Fabric: Building open distributed systems securely by construction</a></span><br/>
+<p class=paperinfo>A secure, decentralized, distributed programming system
+based on information flow control</p>
+<span class=journalname><a href="http://www.iospress.nl/journal/journal-of-computer-security/">J. Computer Security</a></span>, 25(4&ndash;5):319&ndash;321,
+May 2017.
+
+
+Jed Liu, Owen Arden, Michael D. George, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{jfabric,
+title="Fabric: Building open distributed systems securely by construction",
+author="Jed Liu and Owen Arden and Michael D. George and Andrew C. Myers",
+volume="25",
+number="4&ndash;5",
+url="http://www.cs.cornell.edu/andru/papers/jfabric",
+pages="319&ndash;321",
+month="May",
+year="2017"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/trustzone">Verification of a practical hardware security architecture through static information flow analysis</a></span><br/>
+<p class=paperinfo>Verifying information flow in an implementation of the TrustZone architecture</p>
+<span class="conferencename">
+<a href="http://novel.ict.ac.cn/ASPLOS2017">
+Int'l Conf. on Architectural Support for Programming Languages and Operating Systems (ASPLOS)</a></span>,
+April 2017.
+
+
+Andrew Ferraiuolo, Rui Xu, Danfeng Zhang, Andrew C. Myers, and G. Edward Suh.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{trustzone-secverilog,
+title="Verification of a practical hardware security architecture through static information flow analysis",
+author="Andrew Ferraiuolo and Rui Xu and Danfeng Zhang and Andrew C. Myers and
+G. Edward Suh",
+booktitle="Int'l Conf. on Architectural Support for Programming Languages and Operating Systems (ASPLOS)",
+url="http://www.cs.cornell.edu/andru/papers/trustzone",
+month="April",
+year="2017"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/secverilog">SecVerilog project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/abrtchan">Safe serializable secure scheduling: transactions and the trade-off between security and consistency</a></span><br/>
+<p class=paperinfo>A side channel created by an intrinsic conflict between consistency and security, and a fix</p>
+<span class="conferencename">
+<a href="https://www.sigsac.org/ccs/CCS2016/">
+23<span class=ordinal>rd</span> ACM Conf.&nbsp;on Computer and Communications Security (CCS)</a></span>,
+pp. 229&ndash;241,
+October 2016.
+
+
+Isaac Sheff, Tom Magrino, Jed Liu, Andrew C. Myers, and Robbert Van Renesse.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{abrtchan,
+title="Safe serializable secure scheduling: transactions and the trade-off between security and consistency",
+author="Isaac Sheff and Tom Magrino and Jed Liu and Andrew C. Myers and Robbert Van Renesse",
+booktitle="23rd ACM Conf.&nbsp;on Computer and Communications Security (CCS)",
+url="http://www.cs.cornell.edu/andru/papers/abrtchan",
+pages="229&ndash;241",
+month="October",
+year="2016"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/fabric">Fabric project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/flac">A calculus for flow-limited authorization</a></span><br/>
+<p class=paperinfo>A language that uses information flow to check the code of authorization mechanisms.</p>
+<span class="conferencename">
+<a href="http://csf2016.tecnico.ulisboa.pt">
+29<span class=ordinal>th</span> IEEE Symp.&nbsp;on Computer Security Foundations (CSF)</a></span>,
+pp. 135&ndash;147,
+June 2016.
+
+
+Owen Arden and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{flac,
+title="A calculus for flow-limited authorization",
+author="Owen Arden and Andrew C. Myers",
+booktitle="29th IEEE Symp.&nbsp;on Computer Security Foundations (CSF)",
+url="http://www.cs.cornell.edu/andru/papers/flac",
+pages="135&ndash;147",
+month="June",
+year="2016"}</span>
+|&nbsp;<a href="http://hdl.handle.net/1813/42406">TR</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/dac16">SecDCP: Secure dynamic cache partitioning for efficient timing channel protection</a></span><br/>
+<p class=paperinfo>Timing channels can be prevented efficiently by
+dynamically partitioning caches.</p>
+<span class="conferencename">
+<a href="http://dac.com">
+53<span class=ordinal>rd</span> Design Automation Conference (DAC)</a></span>,
+pp. 74:1&ndash;74:6,
+June 2016.
+
+
+Yao Wang, Andrew Ferraiuolo, Danfeng Zhang, Andrew C. Myers, and G. Edward Suh.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{WFZMS16,
+title="SecDCP: Secure dynamic cache partitioning for efficient timing channel protection",
+author="Yao Wang and Andrew Ferraiuolo and Danfeng Zhang and Andrew C. Myers and G. Edward Suh",
+booktitle="53rd Design Automation Conference (DAC)",
+url="http://www.cs.cornell.edu/andru/papers/dac16",
+pages="74:1&ndash;74:6",
+month="June",
+year="2016"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/hpca16">Lattice priority scheduling: low-overhead timing channel
+protection for a shared memory controller</a></span><br/>
+<p class=paperinfo>Using lattice policies to design a low-overhead memory controller that does not leak information via timing channels.</p>
+<span class="conferencename">
+<a href="http://hpca22.site.ac.upc.edu">
+22<span class=ordinal>nd</span> IEEE Symp. on High Performance Computer Architecture (HPCA)</a></span>,
+pp. 382&ndash;393,
+March 2016.
+
+
+Andrew Ferraiuolo, Yao Wang, Danfeng Zhang, Andrew C.
+Myers, and G. Edward Suh.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{Ferraiuolo16,
+title="Lattice priority scheduling: low-overhead timing channel
+protection for a shared memory controller",
+author="Andrew Ferraiuolo and Yao Wang and Danfeng Zhang and Andrew C.
+Myers and Suh, G. Edward",
+booktitle="22nd IEEE Symp. on High Performance Computer Architecture (HPCA)",
+url="http://www.cs.cornell.edu/andru/papers/hpca16",
+pages="382&ndash;393",
+month="March",
+year="2016"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="https://ecommons.cornell.edu/handle/1813/41194">JRIF: reactive information flow control for Java</a></span><br/>
+<p class=paperinfo>Specifying information flow policies with reactive information-flow automata</p>
+Technical report 1813&ndash;41194, Cornell University Computing and Information Science,
+February 2016.
+
+
+Elisavet Kozyri, Owen Arden, Andrew C. Myers, and Fred B. Schneider.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{jrif-tr,
+title="JRIF: reactive information flow control for Java",
+author="Kozyri, Elisavet and Arden, Owen and Myers, Andrew C. and Schneider, Fred B.",
+institution="Cornell University Computing and Information Science",
+number="1813&ndash;41194",
+url="https://ecommons.cornell.edu/handle/1813/41194",
+month="February",
+year="2016"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/FLA_OwenArden.pdf">Flow-limited authorization</a></span><br/>
+
+Ph.D. dissertation, Cornell University,
+2016.
+
+
+Owen Arden.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{owen-thesis,
+title="Flow-limited authorization",
+author="Owen Arden",
+url="http://www.cs.cornell.edu/andru/papers/FLA_OwenArden.pdf",
+year="2016"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/fabric">Fabric project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/kv-thesis.pdf">Building distributed systems with information flow control</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+August 2015.
+
+
+K. Vikram.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{vikram-thesis,
+title="Building distributed systems with information flow control",
+author="K. Vikram",
+url="http://www.cs.cornell.edu/andru/papers/kv-thesis.pdf",
+month="August",
+year="2015"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/fabric">Fabric project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/zhangdf-thesis.pdf">Sound and practical methods for full-system timing channel control</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+August 2015.
+
+
+Danfeng Zhang.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{zhangdf-thesis,
+title="Sound and practical methods for full-system timing channel control",
+author="Danfeng Zhang",
+url="http://www.cs.cornell.edu/andru/papers/zhangdf-thesis.pdf",
+month="August",
+year="2015"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/secverilog">SecVerilog project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/flam">Flow-limited authorization</a></span><br/>
+<p class=paperinfo>An expressive logic for reasoning about the interaction between
+authorization and information flow.</p>
+<span class="conferencename">
+<a href="http://csf2015.di.univr.it">
+28<span class=ordinal>th</span> IEEE Symp.&nbsp;on Computer Security Foundations (CSF)</a></span>,
+pp. 569&ndash;583,
+July 2015.
+
+
+Owen Arden, Jed Liu, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{flam,
+title="Flow-limited authorization",
+author="Owen Arden and Jed Liu and Andrew C. Myers",
+booktitle="28th IEEE Symp.&nbsp;on Computer Security Foundations (CSF)",
+url="http://www.cs.cornell.edu/andru/papers/flam",
+pages="569&ndash;583",
+month="July",
+year="2015"}</span>
+|&nbsp;<a href="http://hdl.handle.net/1813/40138">TR</a>
+|&nbsp;<a href="http://www.cs.cornell.edu/%7Eowen/talks/flam/FLAM.pdf">slides</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://hdl.handle.net/1813/40138">Flow-limited authorization: technical report</a></span><br/>
+
+Technical report 1813&ndash;40138, Cornell University Computing and Information Science,
+May 2015.
+
+
+Owen Arden, Jed Liu, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{flamtr,
+title="Flow-limited authorization: technical report",
+author="Owen Arden and Jed Liu and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="1813&ndash;40138",
+url="http://hdl.handle.net/1813/40138",
+month="May",
+year="2015"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/asplos15">A hardware design language for timing-sensitive information-flow security</a></span><br/>
+<p class=paperinfo>SecVerilog: a security-typed hardware design language for building hardware without leaks or timing channels.</p>
+<span class="conferencename">
+<a href="http://asplos15.bilkent.edu.tr/">
+Int'l Conf. on Architectural Support for Programming Languages and Operating Systems (ASPLOS)</a></span>,
+pp. 503&ndash;516,
+March 2015.
+
+
+Danfeng Zhang, Yao Wang, G. Edward Suh, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zwsm15,
+title="A hardware design language for timing-sensitive information-flow security",
+author="Danfeng Zhang and Yao Wang and G. Edward Suh and Andrew C. Myers",
+booktitle="Int'l Conf. on Architectural Support for Programming Languages and Operating Systems (ASPLOS)",
+url="http://www.cs.cornell.edu/andru/papers/asplos15",
+pages="503&ndash;516",
+month="March",
+year="2015"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/secverilog">SecVerilog project</a>
+|&nbsp;<a href="http://hdl.handle.net/1813/36274">TR</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://hdl.handle.net/1813/42406">A calculus for flow-limited authorization: technical report</a></span><br/>
+
+Technical report 1813&ndash;42406, Cornell University Computing and Information Science,
+February 2015.
+
+
+Owen Arden and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{flac-tr,
+title="A calculus for flow-limited authorization: technical report",
+author="Owen Arden and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="1813&ndash;42406",
+url="http://hdl.handle.net/1813/42406",
+month="February",
+year="2015"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://arxiv.org/abs/1412.3136">Distributed protocols and heterogeneous trust: technical report</a></span><br/>
+
+Technical report arXiv:1412.3136, Cornell University Computer and Information Science,
+December 2014.
+
+
+Isaac C. Sheff, Robbert van Renesse, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{hetconstechreport,
+title="Distributed protocols and heterogeneous trust: technical report",
+author="Isaac C. Sheff and
+Robbert van Renesse and
+Andrew C. Myers",
+institution="Cornell University Computer and Information Science",
+volume="abs/1412.3136",
+number="	arXiv:1412.3136",
+url="http://arxiv.org/abs/1412.3136",
+month="December",
+year="2014"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/plas14">A language-based approach to secure quorum replication</a></span><br/>
+<p class=paperinfo>Quorum replication with information flow control can simultaneously enforce all three core
+security properties: confidentiality, integrity, and availability.</p>
+<span class="conferencename">
+9<span class=ordinal>th</span> ACM SIGPLAN Workshop on Programming Languages and Analysis for Security (PLAS)</span>,
+August 2014.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm14-plas,
+title="A language-based approach to secure quorum replication",
+author="Lantian Zheng and Andrew C. Myers",
+booktitle="9th ACM SIGPLAN Workshop on Programming Languages and Analysis for Security (PLAS)",
+url="http://www.cs.cornell.edu/andru/papers/plas14",
+month="August",
+year="2014"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://hdl.handle.net/1813/36274">A hardware design language for efficient control of timing channels</a></span><br/>
+
+Technical report http://hdl.handle.net/1813/36274, Cornell University Computing and Information Science,
+April 2014.
+
+
+Danfeng Zhang, Yao Wang, G. Edward Suh, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{hwtiming14,
+title="A hardware design language for efficient control of timing channels",
+author="Danfeng Zhang and Yao Wang and G. Edward Suh and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="http://hdl.handle.net/1813/36274",
+url="http://hdl.handle.net/1813/36274",
+month="April",
+year="2014"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/warranties">Warranties for faster strong consistency</a></span><br/>
+<p class=paperinfo>Distributed transactions can be sped up by giving clients
+time-limited invariants on state and computation.</p>
+<span class="conferencename">
+11<span class=ordinal>th</span> USENIX Symp.&nbsp;on Networked Systems Design and Implementation (NSDI)</span>,
+pp. 513&ndash;517,
+April 2014.
+
+
+Jed Liu, Tom Magrino, Owen Arden, Michael D. George, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{warranties,
+title="Warranties for faster strong consistency",
+author="Jed Liu and Tom Magrino and Owen Arden and Michael D. George and Andrew C. Myers",
+booktitle="11th USENIX Symp.&nbsp;on Networked Systems Design and Implementation (NSDI)",
+url="http://www.cs.cornell.edu/andru/papers/warranties",
+pages="513&ndash;517",
+month="April",
+year="2014"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/fabric">Fabric project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/persist">Defining and enforcing referential security</a></span><br/>
+<p class=paperinfo>New security properties related to referential integrity and persistence can be soundly enforced by a type system.</p>
+<span class="conferencename">
+3<span class=ordinal>rd</span> Conf. on Principles of Security and Trust (POST)</span>,
+pp. 199&ndash;219,
+April 2014.
+
+
+Jed Liu and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{persist,
+title="Defining and enforcing referential security",
+author="Liu, Jed and Myers, Andrew C.",
+booktitle="3rd Conf. on Principles of Security and Trust (POST)",
+url="http://www.cs.cornell.edu/andru/papers/persist",
+pages="199&ndash;219",
+month="April",
+year="2014"}</span>
+|&nbsp;<a href="http://hdl.handle.net/1813/35150">TR</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://hdl.handle.net/1813/35150">A language for securely referencing
+persistent information in a federated system</a></span><br/>
+
+Technical report 1813&ndash;35150, Cornell University Computing and Information Science,
+January 2014.
+
+
+Jed Liu and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{persist-TR,
+title="A language for securely referencing
+persistent information in a federated system",
+author="Jed Liu and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="1813&ndash;35150",
+url="http://hdl.handle.net/1813/35150",
+month="January",
+year="2014"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/jed-liu-dissertation.pdf">Towards a secure federated information system</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+August 2012.
+
+
+Jed Liu.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{liu-thesis,
+title="Towards a secure federated information system",
+author="Jed Liu",
+url="http://www.cs.cornell.edu/andru/papers/jed-liu-dissertation.pdf",
+month="August",
+year="2012"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/pltiming.html">Language-based control and mitigation of timing channels</a></span><br/>
+<p class=paperinfo>A type system bounds timing leakage when programs are run on hardware obeying the right contract.</p>
+<span class="conferencename">
+ACM SIGPLAN Conf.&nbsp;on Programming Language Design and Implementation (PLDI)</span>,
+pp. 99&ndash;110,
+June 2012.
+
+
+Danfeng Zhang, Aslan Askarov, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{pldi12,
+title="Language-based control and mitigation of timing channels",
+author="Danfeng Zhang and Aslan Askarov and Andrew C. Myers",
+booktitle="ACM SIGPLAN Conf.&nbsp;on Programming Language Design and Implementation (PLDI)",
+url="http://www.cs.cornell.edu/andru/papers/pltiming.html",
+pages="99&ndash;110",
+month="June",
+year="2012"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/secverilog">SecVerilog project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/mobile.html">Sharing mobile code securely with information flow control</a></span><br/>
+
+<span class="conferencename">
+IEEE Symp.&nbsp;on Security and Privacy</span>,
+pp. 191&ndash;205,
+May 2012.
+
+
+Owen Arden, Michael D. George, Jed Liu, K. Vikram, Aslan Askarov, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{oakland12,
+title="Sharing mobile code securely with information flow control",
+author="Owen Arden and Michael D. George and Jed Liu and K. Vikram
+and Aslan Askarov and Andrew C. Myers",
+booktitle="IEEE Symp.&nbsp;on Security and Privacy",
+url="http://www.cs.cornell.edu/andru/papers/mobile.html",
+pages="191&ndash;205",
+month="May",
+year="2012"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/fabric">Fabric project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/gentiming.html">Predictive mitigation of timing channels in interactive systems</a></span><br/>
+
+<span class="conferencename">
+18<span class=ordinal>th</span> ACM Conf.&nbsp;on Computer and Communications Security (CCS)</span>,
+pp. 563&ndash;574,
+October 2011.
+
+
+Danfeng Zhang, Aslan Askarov, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zam11,
+title="Predictive mitigation of timing channels in interactive systems",
+author="Danfeng Zhang and Aslan Askarov and Andrew C. Myers",
+booktitle="18th ACM Conf.&nbsp;on Computer and Communications Security (CCS)",
+url="http://www.cs.cornell.edu/andru/papers/gentiming.html",
+pages="563&ndash;574",
+month="October",
+year="2011"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/robknowledge-lmcs.pdf">Attacker control and impact for confidentiality and integrity</a></span><br/>
+
+<span class=journalname>Logical Methods in Computer Science</span>, 7(3),
+September 2011.
+
+
+Aslan Askarov and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{am11,
+title="Attacker control and impact for confidentiality and integrity",
+author="Aslan Askarov and Andrew C. Myers",
+volume="7",
+number="3",
+url="http://www.cs.cornell.edu/andru/papers/robknowledge-lmcs.pdf",
+month="September",
+year="2011"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/timing.html">Predictive black-box mitigation of timing channels</a></span><br/>
+
+<span class="conferencename">
+17<span class=ordinal>th</span> ACM Conf.&nbsp;on Computer and Communications Security (CCS)</span>,
+pp. 297&ndash;307,
+October 2010.
+
+
+Aslan Askarov, Danfeng Zhang, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{azm10,
+title="Predictive black-box mitigation of timing channels",
+author="Aslan Askarov and Danfeng Zhang and Andrew C. Myers",
+booktitle="17th ACM Conf.&nbsp;on Computer and Communications Security (CCS)",
+url="http://www.cs.cornell.edu/andru/papers/timing.html",
+pages="297&ndash;307",
+month="October",
+year="2010"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/robknowledge.pdf">A semantic framework for declassification and endorsement</a></span><br/>
+
+<span class="conferencename">
+19<span class=ordinal>th</span> European Symposium on Programming</span>,
+pp. 64&ndash;84,
+March 2010.
+
+
+Aslan Askarov and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{am10,
+title="A semantic framework for declassification and endorsement",
+author="Aslan Askarov and Andrew C. Myers",
+booktitle="19th European Symposium on Programming",
+url="http://www.cs.cornell.edu/andru/papers/robknowledge.pdf",
+pages="64&ndash;84",
+month="March",
+year="2010"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/fabric-sosp09.html">Fabric: a platform for secure distributed computation and storage</a></span><br/>
+
+<span class="conferencename">
+22<span class=ordinal>nd</span> ACM Symp.&nbsp;on Operating System Principles (SOSP)</span>,
+pp. 321&ndash;334,
+October 2009.
+
+
+Jed Liu, Michael D. George, K. Vikram, Xin Qi, Lucas Waye, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{fabric09,
+title="Fabric: a platform for secure distributed computation and storage",
+author="Jed Liu and Michael D. George and K. Vikram and Xin Qi
+and Lucas Waye and Andrew C. Myers",
+booktitle="22nd ACM Symp.&nbsp;on Operating System Principles (SOSP)",
+url="http://www.cs.cornell.edu/andru/papers/fabric-sosp09.html",
+pages="321&ndash;334",
+month="October",
+year="2009"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/fabric">Fabric project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/jbelief.pdf">Quantifying information flow with beliefs</a></span><br/>
+
+<span class=journalname>Journal of Computer Security</span>, 17(5):655&ndash;701,
+October 2009.
+
+
+Michael R. Clarkson, Andrew C. Myers, and Fred B. Schneider.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{cms09,
+title="Quantifying information flow with beliefs",
+author="Michael R. Clarkson and Andrew C. Myers and Fred B. Schneider",
+volume="17",
+number="5",
+url="http://www.cs.cornell.edu/andru/papers/jbelief.pdf",
+pages="655&ndash;701",
+month="October",
+year="2009"}</span>
+|&nbsp;<a href="http://hdl.handle.net/1813/5766">TR</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/clarkson_dissertation.pdf">Quantification and formalization of security</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+August 2009.
+
+
+Michael Clarkson.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{clarkson-thesis,
+title="Quantification and formalization of security",
+author="Michael Clarkson",
+url="http://www.cs.cornell.edu/andru/papers/clarkson_dissertation.pdf",
+month="August",
+year="2009"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://portal.acm.org/citation.cfm?id=1461949">Building secure web applications with automatic partitioning</a></span><br/>
+
+<span class=journalname>Comm.&nbsp;of the ACM</span>, 52(2):79&ndash;87,
+February 2009.
+
+
+Stephen Chong, Jed Liu, Andrew C. Myers, Xin Qi, K. Vikram, Lantian Zheng, and Xin Zheng.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{swift09,
+title="Building secure web applications with automatic partitioning",
+author="Stephen Chong and Jed Liu and Andrew C. Myers and
+Xin Qi and K. Vikram and Lantian Zheng and Xin Zheng",
+volume="52",
+number="2",
+url="http://portal.acm.org/citation.cfm?id=1461949",
+pages="79&ndash;87",
+month="February",
+year="2009"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://people.seas.harvard.edu/~chong/pubs/chong_dissertation.pdf">Expressive and enforceable information security policies</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+August 2008.
+
+
+Stephen Chong.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{chong-thesis,
+title="Expressive and enforceable information security policies",
+author="Stephen Chong",
+url="http://people.seas.harvard.edu/~chong/pubs/chong_dissertation.pdf",
+month="August",
+year="2008"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="https://www.cs.cornell.edu/andru/papers/plas08.pdf">Securing nonintrusive web encryption through information flow</a></span><br/>
+
+<span class="conferencename">
+3<span class=ordinal>rd</span> ACM SIGPLAN Workshop on Programming Languages and Analysis for Security (PLAS)</span>,
+pp. 125&ndash;134,
+June 2008.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm08,
+title="Securing nonintrusive web encryption through information flow",
+author="Lantian Zheng and Andrew C. Myers",
+booktitle="3rd ACM SIGPLAN Workshop on Programming Languages and Analysis for Security (PLAS)",
+url="https://www.cs.cornell.edu/andru/papers/plas08.pdf",
+pages="125&ndash;134",
+month="June",
+year="2008"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/enferasure-csf08.pdf">End-to-end enforcement of erasure and declassification</a></span><br/>
+
+<span class="conferencename">
+IEEE Symp.&nbsp;on Computer Security Foundations (CSF)</span>,
+pp. 98&ndash;111,
+June 2008.
+
+
+Stephen Chong and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{cm08,
+title="End-to-end enforcement of erasure and declassification",
+author="Stephen Chong and Andrew C. Myers",
+booktitle="IEEE Symp.&nbsp;on Computer Security Foundations (CSF)",
+url="http://www.cs.cornell.edu/andru/papers/enferasure-csf08.pdf",
+pages="98&ndash;111",
+month="June",
+year="2008"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/civitas.html">Civitas: Toward a secure voting system</a></span><br/>
+
+<span class="conferencename">
+IEEE Symp.&nbsp;on Security and Privacy</span>,
+pp. 354&ndash;368,
+May 2008.
+
+
+Michael R. Clarkson, Stephen Chong, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{ccm08,
+title="Civitas: Toward a secure voting system",
+author="Michael R. Clarkson and Stephen Chong and Andrew C. Myers",
+booktitle="IEEE Symp.&nbsp;on Security and Privacy",
+url="http://www.cs.cornell.edu/andru/papers/civitas.html",
+pages="354&ndash;368",
+month="May",
+year="2008"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/projects/civitas">Civitas project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/swift-sosp07.pdf">Secure web applications via automatic partitioning</a></span><br/>
+
+<span class="conferencename">
+21<span class=ordinal>st</span> ACM Symp.&nbsp;on Operating System Principles (SOSP)</span>,
+pp. 31&ndash;44,
+October 2007.
+
+(<em>SOSP Best Paper Award.</em>)
+Stephen Chong, Jed Liu, Andrew C. Myers, Xin Qi, K. Vikram, Lantian Zheng, and Xin Zheng.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{swift07,
+title="Secure web applications via automatic partitioning",
+author="Stephen Chong and Jed Liu and Andrew C. Myers and
+Xin Qi and K. Vikram and Lantian Zheng and Xin Zheng",
+booktitle="21st ACM Symp.&nbsp;on Operating System Principles (SOSP)",
+url="http://www.cs.cornell.edu/andru/papers/swift-sosp07.pdf",
+pages="31&ndash;44",
+month="October",
+year="2007"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/sif.pdf">SIF: Enforcing confidentiality and
+integrity in web applications</a></span><br/>
+
+<span class="conferencename">
+16<span class=ordinal>th</span> USENIX Security Symp.</span>,
+August 2007.
+
+
+Stephen Chong, K. Vikram, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{sif07,
+title="SIF: Enforcing confidentiality and
+integrity in web applications",
+author="Stephen Chong and K. Vikram and Andrew C. Myers",
+booktitle="16th USENIX Security Symp.",
+url="http://www.cs.cornell.edu/andru/papers/sif.pdf",
+month="August",
+year="2007"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/jif/sif">SIF project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/dynlabel-ijis.pdf">Dynamic security labels and static information flow control</a></span><br/>
+
+<span class=journalname>International Journal of Information Security</span>, 6(2&ndash;3),
+March 2007.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{zm07,
+title="Dynamic security labels and static information flow control",
+author="Lantian Zheng and Andrew C. Myers",
+volume="6",
+number="2&ndash;3",
+url="http://www.cs.cornell.edu/andru/papers/dynlabel-ijis.pdf",
+month="March",
+year="2007"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://hdl.handle.net/1813/5766">Quantifying information flow with beliefs</a></span><br/>
+
+Technical report 2007-2075, Cornell University Computing and Information Science,
+March 2007.
+
+
+Michael R. Clarkson, Andrew C. Myers, and Fred B. Schneider.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{cms09-tr,
+title="Quantifying information flow with beliefs",
+author="Michael R. Clarkson and Andrew C. Myers and Fred B. Schneider",
+institution="Cornell University Computing and Information Science",
+number="2007-2075",
+url="http://hdl.handle.net/1813/5766",
+month="March",
+year="2007"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/lantian-thesis.pdf">Making distributed computation secure by construction</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+January 2007.
+
+
+Lantian Zheng.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{zheng-thesis,
+title="Making distributed computation secure by construction",
+author="Lantian Zheng",
+url="http://www.cs.cornell.edu/andru/papers/lantian-thesis.pdf",
+month="January",
+year="2007"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/robdlm.pdf">Decentralized robustness</a></span><br/>
+
+<span class="conferencename">
+19<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 242&ndash;253,
+July 2006.
+
+
+Stephen Chong and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{cm06,
+title="Decentralized robustness",
+author="Stephen Chong and Andrew C. Myers",
+booktitle="19th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/robdlm.pdf",
+pages="242&ndash;253",
+month="July",
+year="2006"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/jif">Jif 3.0: Java information flow</a></span><br/>
+
+Software release,
+July 2006.
+
+
+Andrew C. Myers, Lantian Zheng, Steve Zdancewic, Stephen Chong, and Nathaniel Nystrom.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@software{jif,
+title="Jif 3.0: Java information flow",
+author="Andrew C. Myers and Lantian Zheng and Steve Zdancewic and
+Stephen Chong and Nathaniel Nystrom",
+url="http://www.cs.cornell.edu/jif",
+month="July",
+year="2006"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/jif">Jif project</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://techreports.library.cornell.edu:8081/Dienst/UI/1.0/Display/cul.cis/TR2006-2040">Making distributed computation trustworthy by construction: technical report</a></span><br/>
+
+Technical report 2006&ndash;2040, Cornell University Computing and Information Science,
+2006.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{dsimp-tr,
+title="Making distributed computation trustworthy by construction: technical report",
+author="Lantian Zheng and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="2006&ndash;2040",
+url="http://techreports.library.cornell.edu:8081/Dienst/UI/1.0/Display/cul.cis/TR2006-2040",
+year="2006"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/robdecl-jcs">Enforcing robust declassification and qualified robustness</a></span><br/>
+
+<span class=journalname>Journal of Computer Security</span>, 14(2):157&ndash;196,
+2006.
+
+
+Andrew C. Myers, Andrei Sabelfeld, and Steve Zdancewic.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{msz06,
+title="Enforcing robust declassification and qualified robustness",
+author="Andrew C. Myers and Andrei Sabelfeld and Steve Zdancewic",
+volume="14",
+number="2",
+url="http://www.cs.cornell.edu/andru/papers/robdecl-jcs",
+pages="157&ndash;196",
+year="2006"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/erasure.pdf">Language-based information erasure</a></span><br/>
+
+<span class="conferencename">
+18<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 241&ndash;254,
+June 2005.
+
+
+Stephen Chong and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{cm05,
+title="Language-based information erasure",
+author="Stephen Chong and Andrew C. Myers",
+booktitle="18th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/erasure.pdf",
+pages="241&ndash;254",
+month="June",
+year="2005"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/avail.pdf">End-to-end availability policies and noninterference</a></span><br/>
+
+<span class="conferencename">
+18<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 272&ndash;286,
+June 2005.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm05,
+title="End-to-end availability policies and noninterference",
+author="Lantian Zheng and Andrew C. Myers",
+booktitle="18th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/avail.pdf",
+pages="272&ndash;286",
+month="June",
+year="2005"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/InfoFlowBelief.pdf">Belief in information flow</a></span><br/>
+
+<span class="conferencename">
+18<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 31&ndash;45,
+June 2005.
+
+
+Michael R. Clarkson, Andrew C. Myers, and Fred B. Schneider.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{cms05,
+title="Belief in information flow",
+author="Michael R. Clarkson and Andrew C. Myers and Fred B. Schneider",
+booktitle="18th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/InfoFlowBelief.pdf",
+pages="31&ndash;45",
+month="June",
+year="2005"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://techreports.library.cornell.edu:8081/Dienst/UI/1.0/Display/cul.cis/TR2005-1987">End-to-end availability policies and noninterference</a></span><br/>
+
+Technical report 2005&ndash;1987, Cornell University Computing and Information Science,
+2005.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{zm05TR,
+title="End-to-end availability policies and noninterference",
+author="Lantian Zheng and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="2005&ndash;1987",
+url="http://techreports.library.cornell.edu:8081/Dienst/UI/1.0/Display/cul.cis/TR2005-1987",
+year="2005"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/decl-policy.pdf">Security policies for downgrading</a></span><br/>
+
+<span class="conferencename">
+11<span class=ordinal>th</span> ACM Conf.&nbsp;on Computer and Communications Security (CCS)</span>,
+pp. 198&ndash;209,
+October 2004.
+
+
+Stephen Chong and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{cm04,
+title="Security policies for downgrading",
+author="Stephen Chong and Andrew C. Myers",
+booktitle="11th ACM Conf.&nbsp;on Computer and Communications Security (CCS)",
+url="http://www.cs.cornell.edu/andru/papers/decl-policy.pdf",
+pages="198&ndash;209",
+month="October",
+year="2004"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/dynlabel.pdf">Dynamic security labels and noninterference</a></span><br/>
+
+<span class="conferencename">
+2nd Workshop on Formal Aspects in Security
+and Trust (FAST), IFIP TC1 WG1.7</span>,
+August 2004.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm04,
+title="Dynamic security labels and noninterference",
+author="Lantian Zheng and Andrew C. Myers",
+booktitle="2nd Workshop on Formal Aspects in Security
+and Trust (FAST), IFIP TC1 WG1.7",
+url="http://www.cs.cornell.edu/andru/papers/dynlabel.pdf",
+month="August",
+year="2004"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/csfw04.pdf">Enforcing robust declassification</a></span><br/>
+
+<span class="conferencename">
+17<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 172&ndash;186,
+June 2004.
+
+
+Andrew C. Myers, Andrei Sabelfeld, and Steve Zdancewic.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{msz04,
+title="Enforcing robust declassification",
+author="Andrew C. Myers and Andrei Sabelfeld and Steve Zdancewic",
+booktitle="17th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/csfw04.pdf",
+pages="172&ndash;186",
+month="June",
+year="2004"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/isss03.pdf">A model for delimited release</a></span><br/>
+
+<span class="conferencename">
+2003 International Symposium on Software Security</span>,
+pp. 174&ndash;191,
+2004.
+
+
+Andrei Sabelfeld and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{sm04,
+title="A model for delimited release",
+author="Andrei Sabelfeld and Andrew C. Myers",
+booktitle="2003 International Symposium on Software Security",
+number="3233",
+url="http://www.cs.cornell.edu/andru/papers/isss03.pdf",
+pages="174&ndash;191",
+year="2004"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/dynl-tr.pdf">Dynamic security labels and noninterference</a></span><br/>
+
+Technical report 2004&ndash;1924, Cornell University Computing and Information Science,
+2004.
+
+
+Lantian Zheng and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{zm04TR,
+title="Dynamic security labels and noninterference",
+author="Lantian Zheng and Andrew C. Myers",
+institution="Cornell University Computing and Information Science",
+number="2004&ndash;1924",
+url="http://www.cs.cornell.edu/andru/papers/dynl-tr.pdf",
+year="2004"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/csfw03.pdf">Observational determinism for concurrent program security</a></span><br/>
+
+<span class="conferencename">
+16<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 29&ndash;43,
+June 2003.
+
+
+Steve Zdancewic and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm03,
+title="Observational determinism for concurrent program security",
+author="Steve Zdancewic and Andrew C. Myers",
+booktitle="16th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/csfw03.pdf",
+pages="29&ndash;43",
+month="June",
+year="2003"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/sp03.pdf">Using replication and partitioning to build secure distributed
+systems</a></span><br/>
+
+<span class="conferencename">
+IEEE Symp.&nbsp;on Security and Privacy</span>,
+pp. 236&ndash;250,
+May 2003.
+
+
+Lantian Zheng, Stephen Chong, Andrew C. Myers, and Steve Zdancewic.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zcmz03,
+title="Using replication and partitioning to build secure distributed
+systems",
+author="Lantian Zheng and Stephen Chong and Andrew C. Myers and
+Steve Zdancewic",
+booktitle="IEEE Symp.&nbsp;on Security and Privacy",
+url="http://www.cs.cornell.edu/andru/papers/sp03.pdf",
+pages="236&ndash;250",
+month="May",
+year="2003"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/jsac/sm-jsac03.pdf">Language-based information-flow security</a></span><br/>
+
+<span class=journalname>IEEE Journal on Selected Areas in Communications</span>, 21(1):5&ndash;19,
+January 2003.
+
+
+Andrei Sabelfeld and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{sm-jsac,
+title="Language-based information-flow security",
+author="Andrei Sabelfeld and Andrew C. Myers",
+volume="21",
+number="1",
+url="http://www.cs.cornell.edu/andru/papers/jsac/sm-jsac03.pdf",
+pages="5&ndash;19",
+month="January",
+year="2003"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/hosc01.pdf">Secure information flow via linear continuations</a></span><br/>
+
+<span class=journalname>Higher-Order and Symbolic Computation</span>, 15(2&ndash;3):209&ndash;234,
+September 2002.
+
+
+Steve Zdancewic and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{zm02-hosc,
+title="Secure information flow via linear continuations",
+author="Steve Zdancewic and Andrew C. Myers",
+volume="15",
+number="2&ndash;3",
+url="http://www.cs.cornell.edu/andru/papers/hosc01.pdf",
+pages="209&ndash;234",
+month="September",
+year="2002"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cis.upenn.edu/~stevez/papers/Zda02.pdf">Programming languages for information security</a></span><br/>
+
+Ph.D. dissertation, Cornell University Department of Computer Science,
+August 2002.
+
+
+Steve Zdancewic.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@phdthesis{zdance-thesis,
+title="Programming languages for information security",
+author="Steve Zdancewic",
+url="http://www.cis.upenn.edu/~stevez/papers/Zda02.pdf",
+month="August",
+year="2002"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/sosp01/spp-tr.pdf">Secure program partitioning</a></span><br/>
+
+<span class=journalname>ACM Trans.&nbsp;on Computer Systems</span>, 20(3):283&ndash;328,
+August 2002.
+
+
+Steve Zdancewic, Lantian Zheng, Nathaniel Nystrom, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{zznm02,
+title="Secure program partitioning",
+author="Steve Zdancewic and Lantian Zheng and Nathaniel Nystrom and
+Andrew C. Myers",
+volume="20",
+number="3",
+url="http://www.cs.cornell.edu/andru/papers/sosp01/spp-tr.pdf",
+pages="283&ndash;328",
+month="August",
+year="2002"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/sosp01/zznm01.pdf">Untrusted hosts and confidentiality: secure program partitioning</a></span><br/>
+
+<span class="conferencename">
+18<span class=ordinal>th</span> ACM Symp.&nbsp;on Operating System Principles (SOSP)</span>,
+pp. 1&ndash;14,
+October 2001.
+
+(<em>SOSP Best Paper Award.</em>)
+Steve Zdancewic, Lantian Zheng, Nathaniel Nystrom, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zznm01,
+title="Untrusted hosts and confidentiality: secure program partitioning",
+author="Steve Zdancewic and Lantian Zheng and Nathaniel Nystrom and
+Andrew C. Myers",
+booktitle="18th ACM Symp.&nbsp;on Operating System Principles (SOSP)",
+url="http://www.cs.cornell.edu/andru/papers/sosp01/zznm01.pdf",
+pages="1&ndash;14",
+month="October",
+year="2001"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/csfw01.pdf">Robust declassification</a></span><br/>
+
+<span class="conferencename">
+14<span class=ordinal>th</span> IEEE Computer Security Foundations Workshop (CSFW)</span>,
+pp. 15&ndash;23,
+June 2001.
+
+
+Steve Zdancewic and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm01b,
+title="Robust declassification",
+author="Steve Zdancewic and Andrew C. Myers",
+booktitle="14th IEEE Computer Security Foundations Workshop (CSFW)",
+url="http://www.cs.cornell.edu/andru/papers/csfw01.pdf",
+pages="15&ndash;23",
+month="June",
+year="2001"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/sosp01/spp-tr.pdf">Secure program partitioning</a></span><br/>
+
+Technical report 2001&ndash;1846, Cornell University Department of Computer Science,
+2001.
+
+
+Steve Zdancewic, Lantian Zheng, Nathaniel Nystrom, and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{zznm01-tr,
+title="Secure program partitioning",
+author="Steve Zdancewic and Lantian Zheng and Nathaniel Nystrom and
+Andrew C. Myers",
+institution="Cornell University Department of Computer Science",
+number="2001&ndash;1846",
+url="http://www.cs.cornell.edu/andru/papers/sosp01/spp-tr.pdf",
+year="2001"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/lincont.pdf">Secure information flow and CPS</a></span><br/>
+
+<span class="conferencename">
+10<span class=ordinal>th</span> European Symposium on Programming</span>,
+pp. 46&ndash;61,
+2001.
+
+
+Steve Zdancewic and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{zm01,
+title="Secure information flow and CPS",
+author="Steve Zdancewic and Andrew C. Myers",
+booktitle="10th European Symposium on Programming",
+volume="2028",
+url="http://www.cs.cornell.edu/andru/papers/lincont.pdf",
+pages="46&ndash;61",
+year="2001"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/iflow-tosem.pdf">Protecting privacy using the decentralized label model</a></span><br/>
+
+<span class=journalname>ACM Transactions on Software Engineering and Methodology</span>, 9(4):410&ndash;442,
+October 2000.
+
+
+Andrew C. Myers and Barbara Liskov.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@article{ml-tosem,
+title="Protecting privacy using the decentralized label model",
+author="Andrew C. Myers and Barbara Liskov",
+volume="9",
+number="4",
+url="http://www.cs.cornell.edu/andru/papers/iflow-tosem.pdf",
+pages="410&ndash;442",
+month="October",
+year="2000"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://hdl.handle.net/1813/5800">Confidentiality and integrity with untrusted hosts</a></span><br/>
+
+Technical report 2000&ndash;1810, Computer Science Dept., Cornell University,
+August 2000.
+
+
+Steve Zdancewic and Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{zm00TR,
+title="Confidentiality and integrity with untrusted hosts",
+author="Steve Zdancewic and Andrew C. Myers",
+institution="Computer Science Dept., Cornell University",
+number="2000&ndash;1810",
+url="http://hdl.handle.net/1813/5800",
+month="August",
+year="2000"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/popl99/popl99.pdf">JFlow: practical mostly-static information flow control</a></span><br/>
+
+<span class="conferencename">
+26<span class=ordinal>th</span> ACM Symp. on Principles of Programming Languages (POPL)</span>,
+pp. 228&ndash;241,
+January 1999.
+
+(<em>ACM POPL Most Influential Paper Award, 2009.</em>)
+Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{myers-popl99,
+title="JFlow: practical mostly-static information flow control",
+author="Andrew C. Myers",
+booktitle="26th ACM Symp. on Principles of Programming Languages (POPL)",
+url="http://www.cs.cornell.edu/andru/papers/popl99/popl99.pdf",
+pages="228&ndash;241",
+month="January",
+year="1999"}</span>
+|&nbsp;<a href="http://www.cs.cornell.edu/andru/papers/popl99/slides.pdf">slides</a>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/release/tr783.pdf">Mostly-static decentralized information flow control</a></span><br/>
+
+Technical report MIT/LCS/TR-783, Massachusetts Institute of Technology,
+January 1999.
+
+(<em>George M. Sprowls Award for outstanding Ph.D. thesis in the MIT EECS department.</em>)
+Andrew C. Myers.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@techreport{myers-phd-tr-award,
+title="Mostly-static decentralized information flow control",
+author="Andrew C. Myers",
+institution="Massachusetts Institute of Technology",
+number="MIT/LCS/TR-783",
+url="http://www.cs.cornell.edu/andru/release/tr783.pdf",
+month="January",
+year="1999"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/sp98/sp98.pdf">Complete, safe information flow with decentralized labels</a></span><br/>
+
+<span class="conferencename">
+IEEE Symp.&nbsp;on Security and Privacy</span>,
+pp. 186&ndash;197,
+May 1998.
+
+
+Andrew C. Myers and Barbara Liskov.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{ml-sp98,
+title="Complete, safe information flow with decentralized labels",
+author="Andrew C. Myers and Barbara Liskov",
+booktitle="IEEE Symp.&nbsp;on Security and Privacy",
+url="http://www.cs.cornell.edu/andru/papers/sp98/sp98.pdf",
+pages="186&ndash;197",
+month="May",
+year="1998"}</span>&nbsp;]
+
+
+</li>
+<li>
+<span class=papertitle>
+<a href="http://www.cs.cornell.edu/andru/papers/iflow-sosp97/paper.html">A decentralized model for information flow control</a></span><br/>
+
+<span class="conferencename">
+<a href="http://www.cs.washington.edu/sosp16/">
+16<span class=ordinal>th</span> ACM Symp.&nbsp;on Operating System Principles (SOSP)</a></span>,
+pp. 129&ndash;142,
+October 1997.
+
+
+Andrew C. Myers and Barbara Liskov.
+[&nbsp;<span class="bibtex"><span class=xbutton onclick="this.parentNode.style.display = 'none'">×</span>@inproceedings{ml-ifc-97,
+title="A decentralized model for information flow control",
+author="Andrew C. Myers and Barbara Liskov",
+booktitle="16th ACM Symp.&nbsp;on Operating System Principles (SOSP)",
+url="http://www.cs.cornell.edu/andru/papers/iflow-sosp97/paper.html",
+pages="129&ndash;142",
+month="October",
+year="1997"}</span>&nbsp;]
+
+
+</li>
+
+<!--- End jif-pubs.html -->
+      </ol>
+    </section>
+
+    <section id="other-work">
+      <h2>Other work based on Jif</h2>
+      <ol>
+        <li>
+          <cite>Effective blame for information-flow violations</cite>.
+          ACM SIGSOFT Int'l Symposium on Foundations of Software
+          Engineering (FSE 2008).
+          Dave King, Trent Jaeger, Somesh Jha, Sanjit A. Seshia.
+        </li>
+        <li>
+          <cite>
+            Jifclipse: development tools for security-typed languages</cite>.
+          2nd Workshop on Programming languages and Analysis for
+          Security (PLAS), pages 1&ndash;10, June 2007.
+          Boniface Hicks, Dave King, Patrick McDaniel.
+        </li>
+        <li>
+          <cite>
+            <a href="http://www.acsac.org/2006/abstracts/101.html">
+              Understanding practical application development in
+              security-typed languages</a>.
+          </cite><br/>
+          <i>ACSAC 2006</i>.
+          Boniface Hicks, Kiyan Ahmadizadeh, Patrick McDaniel.
+        <li>
+          <cite>
+            Trusted declassification: high-level policy for a
+            security-typed language.
+          </cite><br/>
+          Programming Languages and Analysis for Security, 1st
+          ACM SIGPLAN Workshop on (PLAS), pages 65&ndash;74, June 2006.
+          Boniface Hicks, Dave King, Patrick McDaniel, Michael Hicks.
+        </li>
+        <li>
+          <cite>
+            <a href="http://www.cs.chalmers.se/~andrei/askarov-sabelfeld-esorics05.pdf">
+              Security-typed languages for implementation of
+              cryptographic protocols: a case
+              study</a>.
+          </cite><br/>
+          <i>ESORICS 2005</i>, pages 197&ndash;221, Sept. 2005.
+          Aslan Askarov, Andrei Sabelfeld.
+        </li>
+        <li>
+          <cite>
+            <a href="http://www.springerlink.com/content/pc7ynvx5mqh4yy19/">
+              Language-based enforcement of privacy policies</a>.
+          </cite><br/>
+          Privacy Enhancing Technologies, 4th International
+          Workshop, pages 302&ndash;313, May 2004.
+          Katia Hayati, Martin Abadi.
+        </li>
+      </ol>
+    </section>
+
+    <section id="sponsors">
+      <h2>Sponsors</h2>
+      The development and maintenance of Jif software has been
+      supported by DARPA contracts F30602-98-1-0237 and
+      F30602-99-1-0533, monitored by USAF Rome Laboratory, by ONR
+      Grants N00014-01-1-0968 and N00014-13-1-0089, by NSF grants
+      0133302, 0208642, 0430161, 0627649, and CCF-0964409, and by
+      AFRL NICECAP Award FA8750-08-2-0079.
+    </section>
+  </main>
+
+<script>
+with (EZDom) {
+    var bibs = document.getElementsByClassName("bibtex");
+    for (var i = 0; i < bibs.length; i++) {
+        handle = function(bib) {
+            function display_bibtexs() {
+                bib.style.display = 'inline';
+                var c = bib.parentNode.childNodes;
+            }
+            var n = span({className: 'link',
+                          onclick: display_bibtexs}, "BibTeX");
+            bib.parentNode.insertBefore(n, bib);
+        }
+        handle(bibs[i]);
+    }
+}
+</script>
+
+  <script type="text/javascript">
+    <!--
+      // Traverse through all links and install handlers for smooth scrolling.
+      function linkClicked(e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)
+          // Use default handling for modified clicks.
+          return true;
+
+        var link = e.target;
+        var href = link.getAttribute('href');
+        if (href == null || href.length == 0 || href.charAt(0) != '#') {
+          // Not an anchor link; use default handling.
+          return true;
+        }
+
+        if (!(window.history && window.history.pushState)) {
+          // Browser doesn't support adding to history.
+          return true;
+        }
+
+        var anchor = href.substring(1);
+        smoothScroll(anchor);
+
+        // Push anchor link onto history.
+        history.pushState('', document.title, href);
+        return false;
+      }
+
+      for (var i = 0; i < document.links.length; i++) {
+        document.links[i].onclick = linkClicked;
+      }
+
+      // Obtained from http://stackoverflow.com/a/17731750
+      function currentYPosition() {
+        // Firefox, Chrome, Opera, Safari
+        if (self.pageYOffset) return self.pageYOffset;
+
+        // Internet Explorer 6 - standards mode
+        if (document.documentElement && document.documentElement.scrollTop)
+          return document.documentElement.scrollTop;
+
+        // Internet Explorer 6, 7 and 8
+        if (document.body.scrollTop) return document.body.scrollTop;
+        return 0;
+      }
+
+      // Obtained from http://stackoverflow.com/a/17731750
+      function elmYPosition(eID) {
+        var elm = document.getElementById(eID);
+        var y = elm.offsetTop;
+        var node = elm;
+        while (node.offsetParent && node.offsetParent != document.body) {
+          node = node.offsetParent;
+          y += node.offsetTop;
+        }
+
+        return y;
+      }
+
+      // Adapted from http://stackoverflow.com/a/17731750
+      function smoothScroll(eID) {
+        var startY = currentYPosition();
+        var stopY = elmYPosition(eID) - (window.innerHeight / 4);
+        if (stopY < 0) stopY = 0;
+
+        var direction = (stopY > startY) ? 1 : -1;
+        var distance = Math.abs(stopY - startY);
+
+        var timeStep = 20;
+        var scrollTime = 300;
+
+        var yPos = startY;
+        var time = 0;
+        if (startY != stopY) {
+          for (time = timeStep; yPos != stopY; time += timeStep) {
+            var theta = Math.PI * time / scrollTime;
+            var yPos = startY
+              + direction * distance * (theta + Math.sin(theta)) / Math.PI;
+            if (yPos * direction > stopY * direction) {
+              yPos = stopY;
+            }
+
+            setTimeout("window.scrollTo(0, " + yPos + ")", time);
+          }
+        }
+
+        // Flash the element's background.
+        var elm = document.getElementById(eID);
+        elm.style.animation = 'flash 200ms ease ' + time + 'ms 2';
+
+        setTimeout("document.getElementById('" + eID +
+            "').style.animation = 'none'", time + 500);
+      }
+
+      // Gunk for supporting the visually lightweight mailing list form.
+      document.getElementById("mailing-list-noscript").style.display =
+        "none";
+      document.getElementById("mailing-list-js").style.display =
+        "table-cell";
+
+      function addHiddenInput(form, name, value) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      }
+
+      /**
+       * Returns a random 20-character alphanumeric string.
+       */
+      function genPasswd() {
+        var chars =
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
+        var result = '1aA@';
+        for (var i = 0; i < 20; i++)
+          result += chars[Math.floor(Math.random() * chars.length)];
+        return result;
+      }
+
+      /**
+       * Returns the URL to which the user will be redirected after
+       * submitting the form.
+       */
+      function getURL() {
+        if (document.location.protocol == 'file:')
+          return 'http://www.cs.cornell.edu/jif/';
+        return document.location;
+      }
+
+      function joinMailingList(form) {
+        form.method = 'POST';
+        form.action =
+          'https://www.list.cornell.edu:9443/subscribe/subscribe.tml';
+
+        var pass = genPasswd();
+        addHiddenInput(form, 'pw', pass);
+        addHiddenInput(form, 'pwv', pass);
+        addHiddenInput(form, 'list', 'jif-users-l');
+        addHiddenInput(form, 'lists', 'jif-users-l');
+        addHiddenInput(form, 'demographics', '');
+        addHiddenInput(form, 'name_required', '');
+        addHiddenInput(form, 'pw_required', 'T');
+        addHiddenInput(form, 'confirm', 'one');
+        addHiddenInput(form, 'showconfirm', 'T');
+        addHiddenInput(form, 'url', '');
+        addHiddenInput(form, 'appendsubinfotourl', '');
+        addHiddenInput(form, 'secx', '7faef7bd');
+
+        form.submit();
+      }
+
+      function leaveMailingList(form) {
+        form.method = 'GET';
+        form.action =
+          'https://www.list.cornell.edu:9443/subscribe/unsubscribe.tml';
+
+        addHiddenInput(form, 'lists', 'jif-users-l');
+        addHiddenInput(form, 'email_notification', 'T');
+        addHiddenInput(form, 'confirm_first', 'F');
+        addHiddenInput(form, 'showconfirm', 'T');
+
+        form.submit();
+      }
+    //-->
+  </script>
+</body>
+</html>

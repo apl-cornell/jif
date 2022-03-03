@@ -911,7 +911,8 @@ public class VersionInfo {
               srcdir="${dist}"
               destdir="${dist}"
               includes="VersionInfo.java"
-              classpathref="standard.classpath"/>
+              classpathref="standard.classpath"
+              includeAntRuntime="false"/>
   
       <!-- Get Polyglot version. -->
       <java classname="VersionInfo" outputproperty="polyglot.version">
@@ -1020,7 +1021,7 @@ public class VersionInfo {
        @param ${ext.basedir} the base directory of the extension
     -->
     <target name="compile-ext">
-        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" encoding="UTF-8" debug="on" includes="${ext}/**">
+        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" encoding="UTF-8" debug="on" includes="${ext}/**" includeAntRuntime="false">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
