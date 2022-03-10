@@ -488,14 +488,17 @@ sh ${jif} %CMD_LINE_ARGS%
 
         <!-- Compile the headers for jif.runtime.FileSystem and jif.runtime.Runtime -->
         <javac compiler="modern"
-               includes="jif.runtime.FileSystem,jif.runtime.Runtime"
-               srcdir="${rt-src}/jif/native"
-               destdir="${rt-src}/jif/native">
+            sourcepath=""
+            srcdir="${rt-src}"
+            nativeheaderdir="${rt-src}/jif/native" 
+        >
+            <include name="**/jif/runtime/FileSystem.java"/>
+            <include name="**/jif/runtime/Runtime.java"/>
             <classpath>
                 <pathelement location="${rt-classes}" />
                 <path refid="standard.classpath" />
             </classpath>
-            <compilerarg value="-h ${rt-src}/jif/native" />
+
         </javac>
 
         <fail if="os.unsupported-os" message="Cannot compile the native runtime code. This is not a supported OS." />
