@@ -493,8 +493,8 @@ sh ${jif} %CMD_LINE_ARGS%
         <!-- Compile the headers for jif.runtime.FileSystem and jif.runtime.Runtime -->
         <javac compiler="modern"
                includes="jif.runtime.FileSystem,jif.runtime.Runtime"
-               srcdir="${rt-src}/jif/native"
-               destdir="${rt-src}/jif/native"
+               srcdir="${rt-src}/jif/runtime"
+               destdir="${rt-classes}/jif/runtime"
                includeAntRuntime="false"
                nativeheaderdir="${rt-src}/jif/native">
             <classpath>
