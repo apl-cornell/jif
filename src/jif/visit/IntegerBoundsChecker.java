@@ -1295,8 +1295,8 @@ public class IntegerBoundsChecker
 
     protected static class Bounds {
 
-        public static final Long POS_INF = new Long(Long.MAX_VALUE);
-        public static final Long NEG_INF = new Long(Long.MIN_VALUE);
+        public static final Long POS_INF = Long.valueOf(Long.MAX_VALUE);
+        public static final Long NEG_INF = Long.valueOf(Long.MIN_VALUE);
 
         public static Long refine(Long i, Long j, Bound.Type type) {
             if (type.isLower()) {
