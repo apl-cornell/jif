@@ -84,7 +84,7 @@ public abstract class JoinPolicy_c<P extends Policy> extends Policy_c
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashCode = new Integer(joinComponents.hashCode());
+            hashCode = Integer.valueOf(joinComponents.hashCode());
         }
         return hashCode.intValue();
     }
