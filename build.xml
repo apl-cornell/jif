@@ -401,6 +401,8 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="sig-classes" />
             <arg value="-sourcepath" />
             <arg value="sig-src" />
+            <arg value="-postopts" />
+            <arg value="--patch-module java.base=sig-classes" />
             <!--
             <arg value="-rdebug" />
             -->
@@ -423,6 +425,8 @@ sh ${jif} %CMD_LINE_ARGS%
             <arg value="sig-classes" />
             <arg value="-sourcepath" />
             <arg value="sig-src" />
+            <arg value="-postopts" />
+            <arg value="--patch-module java.base=sig-classes" />
         <arg value="-classpath" />
             <arg path="${java.class.path}" prefix="&quot;" suffix="&quot;" />
             <srcfile />
@@ -463,7 +467,7 @@ sh ${jif} %CMD_LINE_ARGS%
 
     <target name="jif-runtime" depends="init,configure" description="compile the jif runtime">
         <mkdir dir="${rt-classes}" />
-        <javac source="1.8" target="1.8" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**">
+        <javac source="1.8" target="1.8" srcdir="${rt-src}" destdir="${rt-classes}" encoding="UTF-8" debug="on" includes="**" includeantruntime="false">
             <classpath>
                 <pathelement location="${sig-classes}" />
                 <pathelement location="${lib-classes}" />
@@ -498,7 +502,6 @@ sh ${jif} %CMD_LINE_ARGS%
                 <pathelement location="${rt-classes}" />
                 <path refid="standard.classpath" />
             </classpath>
-
         </javac>
 
         <fail if="os.unsupported-os" message="Cannot compile the native runtime code. This is not a supported OS." />
@@ -1024,7 +1027,7 @@ public class VersionInfo {
        @param ${ext.basedir} the base directory of the extension
     -->
     <target name="compile-ext">
-        <javac source="1.7" target="1.7" srcdir="${ext.basedir}/src" destdir="${classes}" encoding="UTF-8" debug="on" includes="${ext}/**" includeAntRuntime="false">
+        <javac source="1.8" target="1.8" srcdir="${ext.basedir}/src" destdir="${classes}" encoding="UTF-8" debug="on" includes="${ext}/**" includeAntRuntime="false">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
