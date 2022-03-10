@@ -43,7 +43,7 @@ public final class ConjunctivePrincipal implements Principal {
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashCode = new Integer(conjuncts.hashCode());
+            hashCode = conjuncts.hashCode();
         }
         return hashCode.intValue();
     }

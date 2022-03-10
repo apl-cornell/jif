@@ -44,7 +44,7 @@ public final class PairLabel implements Label {
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashCode = new Integer(confPol.hashCode() ^ integPol.hashCode());
+            hashCode = confPol.hashCode() ^ integPol.hashCode();
         }
         return hashCode.intValue();
     }

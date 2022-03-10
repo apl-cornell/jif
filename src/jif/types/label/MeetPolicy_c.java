@@ -84,7 +84,7 @@ public abstract class MeetPolicy_c<P extends Policy> extends Policy_c
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashCode = new Integer(meetComponents.hashCode());
+            hashCode = meetComponents.hashCode();
         }
         return hashCode.intValue();
     }

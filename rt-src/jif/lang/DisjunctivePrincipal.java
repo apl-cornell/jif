@@ -42,7 +42,7 @@ public final class DisjunctivePrincipal implements Principal {
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashCode = new Integer(disjuncts.hashCode());
+            hashCode = disjuncts.hashCode();
         }
         return hashCode.intValue();
     }
